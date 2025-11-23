@@ -95,6 +95,9 @@
 
 🟥 - Вилучені заняття
 
+---
+
+[Повернутися на головну](https://github.com/DaniilKhortov/Web-Application-Programming/blob/main/README.md)
 
 
 
