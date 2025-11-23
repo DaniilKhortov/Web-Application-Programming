@@ -1,0 +1,15 @@
+{{/* register.html */}}
+<!DOCTYPE html>
+<html lang="uk">
+<head><meta charset="utf-8"><title>Реєстрація</title></head>
+<body>
+  <h1>Реєстрація</h1>
+  <form method="POST" action="/register">
+    {{.CSRF}}
+    <label>Ім'я: <input name="username" required></label><br>
+    <label>Пароль: <input name="password" type="password" required></label><br>
+    <button type="submit">Зареєструватись</button>
+  </form>
+  <p><a href="/login">Увійти</a></p>
+</body>
+</html>

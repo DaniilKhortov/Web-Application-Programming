@@ -1,0 +1,107 @@
+/* === Основні стилі сторінки === */
+body {
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    max-width: 800px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px 40px;
+}
+
+/* === Заголовки === */
+h1, h2 {
+    text-align: center;
+    color: #004b8d;
+    margin-bottom: 20px;
+}
+
+/* === Таблиця === */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+    padding: 10px;
+}
+
+th {
+    background-color: #e6eef9;
+    color: #003b6f;
+    font-weight: 600;
+}
+
+tr:hover {
+    background-color: #f1f5fb;
+}
+
+/* === Кнопки === */
+button, input[type="submit"] {
+    background-color: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+button:hover, input[type="submit"]:hover {
+    background-color: #005fa3;
+}
+
+button.delete {
+    background-color: #d83b01;
+}
+
+button.delete:hover {
+    background-color: #a52a00;
+}
+
+/* === Форми === */
+form {
+    margin-top: 20px;
+}
+
+input[type="text"] {
+    width: calc(100% - 20px);
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+/* === Посилання === */
+a {
+    text-decoration: none;
+    color: #0078d4;
+    font-weight: 500;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* === Повідомлення === */
+.alert {
+    padding: 10px;
+    background-color: #eaf3ff;
+    border: 1px solid #b3d6ff;
+    color: #004b8d;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}

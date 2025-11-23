@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>{{.Title}}</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+        h1 { color: #333; }
+        table { border-collapse: collapse; width: 50%; background: white; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        th { background-color: #4CAF50; color: white; }
+    </style>
+</head>
+<body>
+    <h1>{{.Title}}</h1>
+    <table>
+        <tr><th>Client`s name</th></tr>
+        {{range .Clients}}
+        <tr><td>{{.}}</td></tr>
+        {{else}}
+        <tr><td>Queue is empty</td></tr>
+        {{end}}
+    </table>
+</body>
+</html>

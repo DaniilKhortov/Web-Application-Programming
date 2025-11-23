@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="uk">
+<link rel="stylesheet" href="/static/style.css">
+<head><meta charset="UTF-8"><title>Edit</title></head>
+<body>
+  <h1>Edit client</h1>
+  <form method="POST">
+    <input type="hidden" name="id" value="{{.}}">
+    New name: <input name="name" required>
+    <button type="submit">Save</button>
+  </form>
+</body>
+</html>

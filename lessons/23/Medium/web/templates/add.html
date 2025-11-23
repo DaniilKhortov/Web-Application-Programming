@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Add client</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #fafafa; padding: 20px; }
+        form { background: white; padding: 20px; border-radius: 10px; width: 300px; }
+        input[type="text"] { width: 100%; padding: 8px; margin-bottom: 10px; }
+        input[type="submit"] { background: #4CAF50; color: white; border: none; padding: 8px 12px; cursor: pointer; }
+        a { display: inline-block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Add new client</h1>
+    <form method="POST" action="/add">
+        <label for="name">Client`s name:</label><br>
+        <input type="text" id="name" name="name" placeholder="Введіть ім’я..." required><br>
+        <input type="submit" value="Додати">
+    </form>
+    <a href="/">← Return</a>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="uk">
+<link rel="stylesheet" href="/static/style.css">
+<head><meta charset="UTF-8"><title>Client queue</title></head>
+<body>
+  <h1>E-Queue</h1>
+  <a href="/create">Add client</a>
+  <table border="1">
+    <tr><th>ID</th><th>Name</th><th>Action</th></tr>
+    {{range .Clients}}
+    <tr>
+      <td>{{.ID}}</td>
+      <td>{{.Name}}</td>
+      <td>
+        <a href="/edit?id={{.ID}}">Edit</a>
+        <form action="/delete?id={{.ID}}" method="POST" style="display:inline;">
+          <button type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {{else}}
+    <tr><td colspan="3">Queue is empty</td></tr>
+    {{end}}
+  </table>
+</body>
+</html>

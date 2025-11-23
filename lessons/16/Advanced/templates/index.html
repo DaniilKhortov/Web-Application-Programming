@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Monitoring panel</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f9f9f9; }
+        h1 { text-align: center; color: #333; }
+        table { margin: 0 auto; border-collapse: collapse; width: 60%; background-color: white; }
+        th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: center; }
+        th { background-color: #eee; }
+        .high { background-color: #ffb3b3; } /* червоне підсвічування */
+    </style>
+</head>
+<body>
+    <h1>Monitoring panel</h1>
+    <table>
+        <tr>
+            <th>sensor ID</th>
+            <th>Current value (Wt)</th>
+        </tr>
+        {{range .}}
+            {{if gt .Value 100.0}}
+                <tr class="high">
+                    <td>{{.ID}}</td>
+                    <td>{{printf "%.2f" .Value}}</td>
+                </tr>
+            {{else}}
+                <tr>
+                    <td>{{.ID}}</td>
+                    <td>{{printf "%.2f" .Value}}</td>
+                </tr>
+            {{end}}
+        {{end}}
+    </table>
+</body>
+</html>

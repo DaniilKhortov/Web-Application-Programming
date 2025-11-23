@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>E-Queue</title>
+    <style>
+        body { font-family: Arial; background: #f8f9fa; color: #333; margin: 40px; }
+        h1 { color: #007bff; }
+        table { border-collapse: collapse; width: 50%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #007bff; color: white; }
+    </style>
+</head>
+<body>
+    <h1>E-Queue of client service</h1>
+    <p>Server is working with HTTP!</p>
+    <table>
+        <tr><th>№</th><th>Client</th></tr>
+        {{range .}}
+        <tr><td>{{.Number}}</td><td>{{.Name}}</td></tr>
+        {{end}}
+    </table>
+</body>
+</html>
