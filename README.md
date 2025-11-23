@@ -1,10 +1,9 @@
 # Програмування Веб Застосунків - Вміст курсу
 
 ## Корисні посилання
-<ul>
-  <li>[План робіт](docs/plan.md)</li>
-  <li>[Актуальний збірник](https://raw.githubusercontent.com/DaniilKhortov/Web-Application-Programming/main/guidebook/Курс_з_GO.docx)</li>
-</ul>
+- [План робіт](docs/plan.md)
+- [Актуальний збірник](https://raw.githubusercontent.com/DaniilKhortov/Web-Application-Programming/main/guidebook/Курс_з_GO.docx)
+
 
 ## Контактна інформація 
 Хортов Даніїл
