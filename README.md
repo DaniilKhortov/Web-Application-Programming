@@ -7,6 +7,8 @@
 </ul>
 
 ## Контактна інформація 
-Хортов Данії
+Хортов Даніїл
+
 Пошта: daniil.khortov.2005@gmail.com
+
 Посилання репозиторію: https://github.com/DaniilKhortov/Web-Application-Programming.git
