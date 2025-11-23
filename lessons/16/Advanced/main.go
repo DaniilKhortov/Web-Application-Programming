@@ -1,46 +1,52 @@
 package main
 
 import (
-	"html/template"
-	"log"
-	"net/http"
+	"fmt"
+	"time"
+
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/widget"
 )
 
-// Структура для даних одного сенсора
-type SensorData struct {
-	ID    string
-	Value float64
-}
-
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// Парсимо шаблон
-		tmpl, err := template.ParseFiles("templates/index.html")
-		if err != nil {
-			http.Error(w, "Template parse error", http.StatusInternalServerError)
-			log.Println("Template parse error:", err)
-			return
-		}
+	// Створюємо новий Fyne-додаток
+	myApp := app.New()
 
-		// Створюємо зріз із кількох датчиків
-		sensors := []SensorData{
-			{ID: "Sensor-001", Value: 85.2},
-			{ID: "Sensor-002", Value: 102.7},
-			{ID: "Sensor-003", Value: 76.4},
-			{ID: "Sensor-004", Value: 145.9},
-		}
+	// Головне вікно
+	myWindow := myApp.NewWindow("Застосунок 3")
 
-		// Передаємо зріз у шаблон
-		err = tmpl.Execute(w, sensors)
-		if err != nil {
-			http.Error(w, "Template execute error", http.StatusInternalServerError)
-			log.Println("Template execute error:", err)
-		}
-	})
+	// Мітка, що показує час
+	timeLabel := widget.NewLabel("Час оновлюється...")
 
-	log.Println("Server launched at http://localhost:8080")
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		log.Fatal("Server launch error:", err)
-	}
+	// Додаткова мітка для опису
+	titleLabel := widget.NewLabel("Поточний час системи:")
+
+	// Контейнер для компонування
+	content := container.NewVBox(
+		titleLabel,
+		timeLabel,
+	)
+
+	myWindow.SetContent(content)
+	myWindow.Resize(fyne.NewSize(300, 200))
+	myWindow.Show()
+
+	// Ticker генерує подію щосекунди
+	ticker := time.NewTicker(1 * time.Second)
+
+	// Запускаємо горутину для оновлення часу
+	go func() {
+		for t := range ticker.C {
+			// Форматуємо поточний час
+			currentTime := t.Format("15:04:05")
+
+			// Оновлення тексту мітки у GUI
+			timeLabel.SetText(fmt.Sprintf(" %s", currentTime))
+		}
+	}()
+
+	// Запуск основного циклу програми
+	myApp.Run()
 }

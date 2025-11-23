@@ -1,67 +1,54 @@
-// file: main.go
 package main
 
 import (
 	"fmt"
-	"math/rand"
 	"time"
 )
 
-// processingDone — канал повідомляє, що черговий клієнт оброблений
-// shutdown — глобальний сигнал зупинки всієї системи (вимикає монітор)
+// producer — функція, що відправляє дані у канал лише для запису
+// та реагує на сигнал завершення через канал лише для читання
+func producer(dataCh chan<- int, done <-chan bool) {
+	for i := 1; i <= 10; i++ {
+		select {
+		case <-done:
+			fmt.Println("Producer: sygnal of finishing recieved. Work finished!")
+			return
+		case dataCh <- i:
+			fmt.Printf("Producer: sent data %d\n", i)
+			time.Sleep(400 * time.Millisecond)
+		}
+	}
+	fmt.Println("Producer: all data sent. That is all for today!")
+}
+
+// consumer — функція, що приймає дані з каналу лише для читання
+func consumer(dataCh <-chan int) {
+	for value := range dataCh {
+		fmt.Printf("Consumer: recieved data %d\n", value)
+		time.Sleep(700 * time.Millisecond)
+	}
+	fmt.Println("Consumer: channel is closed! Work finished!")
+}
+
 func main() {
+	// Канал для даних (буферизований, щоб уникнути блокувань при коротких затримках)
+	dataCh := make(chan int, 3)
 
-	processingDone := make(chan int) // небуферизований канал: події завершення обробки
-	shutdown := make(chan struct{})  // небуферизований канал: глобальне завершення
+	// Канал сигналу завершення
+	done := make(chan bool)
 
-	// Імітація джерела подій (обробка клієнтів)
-	go clientProcessor(processingDone, shutdown)
+	// Запуск producer та consumer
+	go producer(dataCh, done)
+	go consumer(dataCh)
 
-	// Імітація монітору стану системи
-	go statusMonitor(processingDone, shutdown)
-
-	// Дозволяємо системі попрацювати кілька секунд
+	// Даємо системі попрацювати 3 секунди, а потім зупиняємо producer
 	time.Sleep(3 * time.Second)
+	fmt.Println("Main: sending sygnal of finishing to producer...")
+	done <- true
 
-	// Відправляємо глобальний сигнал завершення
-	fmt.Println("\n[MAIN] Sending command to end...")
-	close(shutdown)
-
-	// Додатковий час для коректного завершення горутин
+	// Трохи чекаємо, щоб завершились всі операції
 	time.Sleep(1 * time.Second)
-	fmt.Println("[MAIN] Work is done!")
-}
+	close(dataCh)
 
-// clientProcessor — генерує події (обробку клієнтів)
-func clientProcessor(done chan<- int, shutdown <-chan struct{}) {
-	clientID := 1
-	for {
-		select {
-		case <-shutdown:
-			fmt.Println("[Processor] Recieved finnishing command. Aborting process.")
-			return
-		default:
-			// імітація тривалості обробки клієнта
-			time.Sleep(time.Duration(200+rand.Intn(300)) * time.Millisecond)
-			fmt.Printf("[Processor] Client #%d served.\n", clientID)
-			done <- clientID
-			clientID++
-		}
-	}
-}
-
-// statusMonitor — слухає два канали: події обробки і сигнал завершення
-func statusMonitor(done <-chan int, shutdown <-chan struct{}) {
-	active := 0
-	for {
-		select {
-		case id := <-done:
-			active++
-			fmt.Printf("[Monitor] Clients served: %d (last #%d)\n", active, id)
-
-		case <-shutdown:
-			fmt.Printf("[Monitor] Recieved finnishing command. Result: %d clients.\n", active)
-			return
-		}
-	}
+	fmt.Println("Main: work finished!")
 }

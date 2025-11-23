@@ -1,148 +1,67 @@
+// file: main.go
 package main
 
 import (
-	"errors"
 	"fmt"
-	"strings"
-	"sync"
+	"math/rand"
 	"time"
 )
 
-// --- Структура даних ---
-type Client struct {
-	ID        int
-	Name      string
-	TicketNum int
-}
-
-// --- Глобальні структури ---
-type Result struct {
-	Client  Client
-	Message string
-}
-
-// --- Етап 1: DataGenerator ---
-func DataGenerator(out chan<- Client, errCh chan<- error, done chan struct{}) {
-	defer close(out)
-
-	input := []Client{
-		{1, "Michael", 1},
-		{2, "Maria", 2},
-		{3, "", 3},        // некоректне ім’я
-		{4, "Dmytro", -1}, // некоректний номер
-		{5, "Daryna", 4},
-	}
-
-	for _, c := range input {
-		select {
-		case <-done:
-			fmt.Println("[Generator] Finnished computing by command")
-			return
-		default:
-			fmt.Println("[Generator] Sent:", c)
-			out <- c
-			time.Sleep(200 * time.Millisecond)
-		}
-	}
-}
-
-// --- Етап 2: Validator ---
-func Validator(in <-chan Client, out chan<- Client, errCh chan<- error, done chan struct{}) {
-	defer close(out)
-
-	for client := range in {
-		select {
-		case <-done:
-			fmt.Println("[Validator] Finnished computing by command")
-			return
-		default:
-			if !validate(client) {
-				err := errors.New(fmt.Sprintf("Invalid clients data: %+v", client))
-				errCh <- err
-				return // негайно завершуємо конвеєр
-			}
-			fmt.Printf("[Validator] Data is correct: %+v\n", client)
-			out <- client
-			time.Sleep(250 * time.Millisecond)
-		}
-	}
-}
-
-// --- Етап 3: Aggregator ---
-func Aggregator(in <-chan Client, results chan<- Result, errCh chan<- error, done chan struct{}) {
-	defer close(results)
-
-	for client := range in {
-		select {
-		case <-done:
-			fmt.Println("[Aggregator] Finnished computing by command")
-			return
-		default:
-			message := fmt.Sprintf("Client %s with number %d served.", client.Name, client.TicketNum)
-			results <- Result{Client: client, Message: message}
-			fmt.Println("[Aggregator] Added result:", message)
-			time.Sleep(300 * time.Millisecond)
-		}
-	}
-}
-
-// --- Валідація ---
-func validate(c Client) bool {
-	if strings.TrimSpace(c.Name) == "" {
-		return false
-	}
-	if c.TicketNum <= 0 {
-		return false
-	}
-	return true
-}
-
-// --- Основна функція ---
+// processingDone — канал повідомляє, що черговий клієнт оброблений
+// shutdown — глобальний сигнал зупинки всієї системи (вимикає монітор)
 func main() {
-	fmt.Println("E-Queue")
 
-	dataCh := make(chan Client)
-	validCh := make(chan Client)
-	resultsCh := make(chan Result)
-	errCh := make(chan error)
-	done := make(chan struct{})
+	processingDone := make(chan int) // небуферизований канал: події завершення обробки
+	shutdown := make(chan struct{})  // небуферизований канал: глобальне завершення
 
-	var wg sync.WaitGroup
-	wg.Add(3)
+	// Імітація джерела подій (обробка клієнтів)
+	go clientProcessor(processingDone, shutdown)
 
-	// Запуск етапів
-	go func() {
-		defer wg.Done()
-		DataGenerator(dataCh, errCh, done)
-	}()
+	// Імітація монітору стану системи
+	go statusMonitor(processingDone, shutdown)
 
-	go func() {
-		defer wg.Done()
-		Validator(dataCh, validCh, errCh, done)
-	}()
+	// Дозволяємо системі попрацювати кілька секунд
+	time.Sleep(3 * time.Second)
 
-	go func() {
-		defer wg.Done()
-		Aggregator(validCh, resultsCh, errCh, done)
-	}()
+	// Відправляємо глобальний сигнал завершення
+	fmt.Println("\n[MAIN] Sending command to end...")
+	close(shutdown)
 
-	// Горутина для виводу результатів
-	go func() {
-		for res := range resultsCh {
-			fmt.Printf("[Result] %s\n", res.Message)
+	// Додатковий час для коректного завершення горутин
+	time.Sleep(1 * time.Second)
+	fmt.Println("[MAIN] Work is done!")
+}
+
+// clientProcessor — генерує події (обробку клієнтів)
+func clientProcessor(done chan<- int, shutdown <-chan struct{}) {
+	clientID := 1
+	for {
+		select {
+		case <-shutdown:
+			fmt.Println("[Processor] Recieved finnishing command. Aborting process.")
+			return
+		default:
+			// імітація тривалості обробки клієнта
+			time.Sleep(time.Duration(200+rand.Intn(300)) * time.Millisecond)
+			fmt.Printf("[Processor] Client #%d served.\n", clientID)
+			done <- clientID
+			clientID++
 		}
-	}()
-
-	// Основний select: очікування помилки або завершення
-	select {
-	case err := <-errCh:
-		fmt.Println("\n[Main] Recieved error:", err)
-		close(done) // сигнал усім етапам завершитись
-	case <-time.After(5 * time.Second):
-		fmt.Println("\n[Main] Work is done without error!")
-		close(done)
 	}
+}
 
-	wg.Wait()
-	fmt.Println("Work is done!")
+// statusMonitor — слухає два канали: події обробки і сигнал завершення
+func statusMonitor(done <-chan int, shutdown <-chan struct{}) {
+	active := 0
+	for {
+		select {
+		case id := <-done:
+			active++
+			fmt.Printf("[Monitor] Clients served: %d (last #%d)\n", active, id)
+
+		case <-shutdown:
+			fmt.Printf("[Monitor] Recieved finnishing command. Result: %d clients.\n", active)
+			return
+		}
+	}
 }

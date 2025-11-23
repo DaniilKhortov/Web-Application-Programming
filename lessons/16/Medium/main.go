@@ -1,44 +1,71 @@
 package main
 
 import (
-	"html/template"
-	"log"
-	"net/http"
+	"fmt"
+	"strconv"
+	"time"
+
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/widget"
 )
 
-// Структура для зберігання даних про сенсор
-type SensorData struct {
-	ID    string
-	Value float64
-}
-
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// Парсимо HTML-шаблон із файлу
-		tmpl, err := template.ParseFiles("templates/index.html")
-		if err != nil {
-			http.Error(w, "Template parse error", http.StatusInternalServerError)
-			log.Println("Template parse error:", err)
+	// Створення додатку
+	myApp := app.New()
+
+	// Створення головного вікна
+	myWindow := myApp.NewWindow("Застосунок 2")
+
+	// Поля вводу для двох чисел
+	entry1 := widget.NewEntry()
+	entry1.SetPlaceHolder("Введіть перше число")
+
+	entry2 := widget.NewEntry()
+	entry2.SetPlaceHolder("Введіть друге число")
+
+	// Мітка для відображення результату
+	resultLabel := widget.NewLabel("Місце для результату")
+
+	// Кнопка для виконання обчислення
+	calcButton := widget.NewButton("Обчислити суму", func() {
+		// Отримання тексту з полів
+		num1Text := entry1.Text
+		num2Text := entry2.Text
+
+		// Спроба перетворення тексту у числа
+		num1, err1 := strconv.ParseFloat(num1Text, 64)
+		num2, err2 := strconv.ParseFloat(num2Text, 64)
+
+		// Перевірка на помилки
+		if err1 != nil || err2 != nil {
+			resultLabel.SetText(fmt.Sprintf("[%s] Помилка: введіть лише числа!", time.Now().Format("15:04:05")))
 			return
 		}
 
-		// Створюємо об’єкт SensorData з тестовими даними
-		data := SensorData{
-			ID:    "Sensor-001",
-			Value: 123.45,
-		}
+		// Обчислення суми
+		sum := num1 + num2
 
-		// Виконуємо шаблон із передачею структури
-		err = tmpl.Execute(w, data)
-		if err != nil {
-			http.Error(w, "Template execute error", http.StatusInternalServerError)
-			log.Println("Template execute error:", err)
-		}
+		// Виведення результату
+		resultLabel.SetText(fmt.Sprintf("[%s] Сума: %.2f", time.Now().Format("15:04:05"), sum))
 	})
 
-	log.Println("Server launched at http://localhost:8080")
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		log.Fatal("Server launch error", err)
-	}
+	// Розташування елементів у вертикальному контейнері
+	content := container.NewVBox(
+		widget.NewLabel("Введіть два числа для обчислення суми:"),
+		entry1,
+		entry2,
+		calcButton,
+		resultLabel,
+	)
+
+	// Встановлення вмісту вікна
+	myWindow.SetContent(content)
+
+	// Встановлення розміру вікна
+	myWindow.Resize(fyne.NewSize(400, 300))
+
+	// Запуск програми
+	myWindow.ShowAndRun()
 }

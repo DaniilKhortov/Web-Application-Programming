@@ -1,93 +1,67 @@
+// file: main.go
 package main
 
 import (
 	"fmt"
-	"strings"
 	"sync"
 	"time"
 )
 
-// Структура клієнта
-type Client struct {
-	ID        int
-	Name      string
-	TicketNum int
+// ElectronicQueue — модель черги обслуговування клієнтів
+type ElectronicQueue struct {
+	value int
+	mu    sync.RWMutex
 }
 
-// Спільний ресурс — оброблені ID
-var (
-	ProcessedIDs []int
-	mu           sync.Mutex // захист від Data Race
-)
+// Get — читає поточне значення (імітація читання з бази)
+func (q *ElectronicQueue) Get(id int) int {
+	q.mu.RLock() // дозволяє одночасне читання
+	defer q.mu.RUnlock()
 
-// --- Етап 1: DataGenerator ---
-func DataGenerator(out chan<- Client) {
-	input := []Client{
-		{1, "Michael", 1},
-		{2, "Maria", 2},
-		{3, "", 3},        // некоректне ім’я
-		{4, "Dmytro", -1}, // некоректний номер
-		{5, "Daryna", 4},
-	}
-
-	for _, client := range input {
-		fmt.Printf("[Generator] Client sent: %+v\n", client)
-		out <- client
-		time.Sleep(200 * time.Millisecond)
-	}
-	close(out) // важливо: коректне закриття після завершення надсилання
+	fmt.Printf("[Reader %02d] Reading: %d\n", id, q.value)
+	time.Sleep(10 * time.Millisecond) // імітація часу запиту (повільне читання)
+	return q.value
 }
 
-// --- Етап 2: ParallelFilter (паралельна обробка) ---
-func ParallelFilter(id int, in <-chan Client, wg *sync.WaitGroup) {
-	defer wg.Done()
+// Update — оновлює значення (імітація запису)
+func (q *ElectronicQueue) Update(id int) {
+	q.mu.Lock() // ексклюзивний доступ — блокує всіх читачів і писців
+	defer q.mu.Unlock()
 
-	for client := range in {
-		if validate(client) {
-			mu.Lock()
-			ProcessedIDs = append(ProcessedIDs, client.ID)
-			mu.Unlock()
-			fmt.Printf("[Worker %d] Client '%s' is registered as %d\n",
-				id, client.Name, client.TicketNum)
-		} else {
-			fmt.Printf("[Worker %d] Invalid data: %+v\n", id, client)
-		}
-		time.Sleep(300 * time.Millisecond)
-	}
+	old := q.value
+	q.value++
+	fmt.Printf("[Writer %02d] Updating %d into %d\n", id, old, q.value)
+	time.Sleep(50 * time.Millisecond) // імітація тривалого запису
 }
 
-// --- Функція валідації ---
-func validate(c Client) bool {
-	if strings.TrimSpace(c.Name) == "" {
-		return false
-	}
-	if c.TicketNum <= 0 {
-		return false
-	}
-	return true
-}
-
-// --- Основна функція ---
 func main() {
-	fmt.Println("E-Queue")
-
-	dataChan := make(chan Client)
+	queue := &ElectronicQueue{}
 	var wg sync.WaitGroup
 
-	// Запускаємо генератор
-	go DataGenerator(dataChan)
+	readers := 100
+	writers := 5
 
-	// Запускаємо 3 паралельні обробники
-	numWorkers := 3
-	wg.Add(numWorkers)
-	for i := 1; i <= numWorkers; i++ {
-		go ParallelFilter(i, dataChan, &wg)
+	fmt.Printf("Running %d readers and %d writers to serve clients simulteniosly.\n\n", readers, writers)
+
+	// Стартуємо всі читачі
+	for i := 0; i < readers; i++ {
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+			queue.Get(id)
+		}(i + 1)
+	}
+
+	// Стартуємо всі писці
+	for i := 0; i < writers; i++ {
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+			queue.Update(id)
+		}(i + 1)
 	}
 
 	wg.Wait()
-
-	fmt.Println("\nAll client served!")
-	mu.Lock()
-	fmt.Println("ID of clients after check:", ProcessedIDs)
-	mu.Unlock()
+	fmt.Printf("\nFinal  queue: %d\n", queue.value)
+	fmt.Println("RWMutex synchronization complete!")
 }

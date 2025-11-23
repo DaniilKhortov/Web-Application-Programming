@@ -1,4 +1,3 @@
-// file: main.go
 package main
 
 import (
@@ -7,61 +6,44 @@ import (
 	"time"
 )
 
-// ElectronicQueue — модель черги обслуговування клієнтів
-type ElectronicQueue struct {
-	value int
-	mu    sync.RWMutex
-}
+// sensorWorker імітує датчик, який надсилає кількість клієнтів у черзі
+func sensorWorker(id int, dataCh chan int, wg *sync.WaitGroup) {
+	defer wg.Done() // сигналізуємо про завершення goroutine
 
-// Get — читає поточне значення (імітація читання з бази)
-func (q *ElectronicQueue) Get(id int) int {
-	q.mu.RLock() // дозволяє одночасне читання
-	defer q.mu.RUnlock()
-
-	fmt.Printf("[Reader %02d] Reading: %d\n", id, q.value)
-	time.Sleep(10 * time.Millisecond) // імітація часу запиту (повільне читання)
-	return q.value
-}
-
-// Update — оновлює значення (імітація запису)
-func (q *ElectronicQueue) Update(id int) {
-	q.mu.Lock() // ексклюзивний доступ — блокує всіх читачів і писців
-	defer q.mu.Unlock()
-
-	old := q.value
-	q.value++
-	fmt.Printf("[Writer %02d] Updating %d into %d\n", id, old, q.value)
-	time.Sleep(50 * time.Millisecond) // імітація тривалого запису
+	for i := 1; i <= 4; i++ {
+		value := id*10 + i // наприклад, унікальне значення від кожного датчика
+		dataCh <- value
+		fmt.Printf("Counter #%d: sent value %d\n", id, value)
+		time.Sleep(300 * time.Millisecond) // імітація затримки між відправленнями
+	}
+	fmt.Printf("Counter #%d: finished work\n", id)
 }
 
 func main() {
-	queue := &ElectronicQueue{}
+	// Створення буферизованого каналу розміром 5 для передачі цілих чисел
+	dataCh := make(chan int, 5)
+
+	// Використання WaitGroup для синхронізації трьох goroutines
 	var wg sync.WaitGroup
+	wg.Add(3)
 
-	readers := 100
-	writers := 5
-
-	fmt.Printf("Running %d readers and %d writers to serve clients simulteniosly.\n\n", readers, writers)
-
-	// Стартуємо всі читачі
-	for i := 0; i < readers; i++ {
-		wg.Add(1)
-		go func(id int) {
-			defer wg.Done()
-			queue.Get(id)
-		}(i + 1)
+	// Запуск трьох датчиків (goroutines)
+	for i := 1; i <= 3; i++ {
+		go sensorWorker(i, dataCh, &wg)
 	}
 
-	// Стартуємо всі писці
-	for i := 0; i < writers; i++ {
-		wg.Add(1)
-		go func(id int) {
-			defer wg.Done()
-			queue.Update(id)
-		}(i + 1)
+	// Гороутина-агрегатор (головна) читає всі значення з каналу
+	go func() {
+		wg.Wait()     // чекаємо завершення всіх датчиків
+		close(dataCh) // після завершення — закриваємо канал
+	}()
+
+	fmt.Println("[Agregator] Waiting for data ...")
+
+	// Читаємо значення з каналу за допомогою for range
+	for value := range dataCh {
+		fmt.Printf("[Agregator] reciewed data %d\n", value)
 	}
 
-	wg.Wait()
-	fmt.Printf("\nFinal  queue: %d\n", queue.value)
-	fmt.Println("RWMutex synchronization complete!")
+	fmt.Println("Work finished! Channel closed!")
 }

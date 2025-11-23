@@ -1,58 +1,62 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 )
 
-// структура для передачі даних у шаблон
-type ThankYouData struct {
-	Username string
+// Структура для JSON-відповіді
+type PowerData struct {
+	PowerGenerated int    `json:"power_generated"`
+	Units          string `json:"units"`
 }
 
 func main() {
-	// Обробник GET — відображення форми
-	http.HandleFunc("/form", formHandler)
+	// Реєстрація маршруту для кореневого шляху "/"
+	http.HandleFunc("/", rootHandler)
 
-	fmt.Println("Server launched at http://localhost:8080/form")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	// Новий маршрут /status
+	http.HandleFunc("/status", statusHandler)
+
+	// Новий маршрут /data
+	http.HandleFunc("/data", dataHandler)
+
+	// Повідомлення у консолі
+	fmt.Println("Server deployed at 8081...")
+
+	// Запуск HTTP-сервера з обробкою помилок
+	err := http.ListenAndServe(":8081", nil)
+	if err != nil {
+		log.Fatal("Error at server deployment:", err)
+	}
 }
 
-// formHandler обробляє і GET, і POST на /form
-func formHandler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodGet:
-		// Відображаємо HTML-форму
-		tmpl, err := template.ParseFiles("templates/form.html")
-		if err != nil {
-			http.Error(w, "Form parsing error", http.StatusInternalServerError)
-			return
-		}
-		tmpl.Execute(w, nil)
+// Обробник для маршруту "/"
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Server is running")
+}
 
-	case http.MethodPost:
-		// Обробляємо надіслані дані
-		if err := r.ParseForm(); err != nil {
-			http.Error(w, "Form process error", http.StatusBadRequest)
-			return
-		}
+// Обробник для маршруту "/status"
+func statusHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Status: OK")
+}
 
-		username := r.PostFormValue("username")
-		fmt.Println("Recieved new user:", username)
+// Обробник для маршруту "/data"
+func dataHandler(w http.ResponseWriter, r *http.Request) {
+	// Створюємо об’єкт з даними
+	data := PowerData{
+		PowerGenerated: 1500,
+		Units:          "watts",
+	}
 
-		// Формуємо персоналізовану відповідь через шаблон
-		tmpl, err := template.ParseFiles("templates/thanks.html")
-		if err != nil {
-			http.Error(w, "Response error", http.StatusInternalServerError)
-			return
-		}
+	// Встановлюємо правильний заголовок для JSON
+	w.Header().Set("Content-Type", "application/json")
 
-		data := ThankYouData{Username: username}
-		tmpl.Execute(w, data)
-
-	default:
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	// Кодуємо дані у JSON та надсилаємо клієнту
+	err := json.NewEncoder(w).Encode(data)
+	if err != nil {
+		http.Error(w, "Error generating JSON", http.StatusInternalServerError)
 	}
 }

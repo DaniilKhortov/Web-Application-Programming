@@ -1,3 +1,3 @@
-module validation
+module main
 
 go 1.25.1

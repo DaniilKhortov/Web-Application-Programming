@@ -1,62 +1,114 @@
 package main
 
 import (
-	"encoding/json"
+	"bufio"
 	"fmt"
-	"log"
-	"net/http"
+	"os"
+	"strings"
 )
 
-// Структура для JSON-відповіді
-type PowerData struct {
-	PowerGenerated int    `json:"power_generated"`
-	Units          string `json:"units"`
+// Функція копіювання рядків з одного файлу в інший
+func copyLines(srcFile, dstFile string) (int, error) {
+	// Відкриваємо файл для читання
+	src, err := os.Open(srcFile)
+	if err != nil {
+		return 0, fmt.Errorf("cannot open source file: %v", err)
+	}
+	defer src.Close()
+
+	// Відкриваємо файл для запису
+	dst, err := os.Create(dstFile)
+	if err != nil {
+		return 0, fmt.Errorf("cannot create destination file: %v", err)
+	}
+	defer dst.Close()
+
+	scanner := bufio.NewScanner(src)
+	writer := bufio.NewWriter(dst)
+	defer writer.Flush()
+
+	lineCount := 0
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		// Тут можна додати фільтрацію, наприклад:
+		// if strings.Contains(line, "VIP") { ... }
+
+		_, err := writer.WriteString(line + "\n")
+		if err != nil {
+			return lineCount, fmt.Errorf("error writing to destination file: %v", err)
+		}
+		lineCount++
+	}
+
+	// Перевірка на помилки сканера
+	if err := scanner.Err(); err != nil {
+		return lineCount, fmt.Errorf("error reading source file: %v", err)
+	}
+
+	return lineCount, nil
 }
 
 func main() {
-	// Реєстрація маршруту для кореневого шляху "/"
-	http.HandleFunc("/", rootHandler)
+	filename := "queue.txt"
+	copyFile := "queue_copy.txt"
 
-	// Новий маршрут /status
-	http.HandleFunc("/status", statusHandler)
-
-	// Новий маршрут /data
-	http.HandleFunc("/data", dataHandler)
-
-	// Повідомлення у консолі
-	fmt.Println("Server deployed at 8081...")
-
-	// Запуск HTTP-сервера з обробкою помилок
-	err := http.ListenAndServe(":8081", nil)
+	// Введення даних користувачем
+	file, err := os.Create(filename)
 	if err != nil {
-		log.Fatal("Error at server deployment:", err)
+		fmt.Println("Error creating file:", err)
+		return
 	}
-}
+	defer file.Close()
 
-// Обробник для маршруту "/"
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Server is running")
-}
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("Enter client data (Name Surname ID). Press Enter on empty line to finish:")
 
-// Обробник для маршруту "/status"
-func statusHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Status: OK")
-}
+	for {
+		fmt.Print("Client: ")
+		text, _ := reader.ReadString('\n')
+		text = strings.TrimSpace(text)
+		if text == "" {
+			break
+		}
 
-// Обробник для маршруту "/data"
-func dataHandler(w http.ResponseWriter, r *http.Request) {
-	// Створюємо об’єкт з даними
-	data := PowerData{
-		PowerGenerated: 1500,
-		Units:          "watts",
+		_, err := file.WriteString(text + "\n")
+		if err != nil {
+			fmt.Println("Error writing to file:", err)
+			return
+		}
 	}
 
-	// Встановлюємо правильний заголовок для JSON
-	w.Header().Set("Content-Type", "application/json")
+	fmt.Println("\nData saved successfully to", filename)
 
-	// Кодуємо дані у JSON та надсилаємо клієнту
-	err := json.NewEncoder(w).Encode(data)
+	// Читання файлу построчно
+	srcFile, err := os.Open(filename)
 	if err != nil {
-		http.Error(w, "Error generating JSON", http.StatusInternalServerError)
+		fmt.Println("Error opening file for reading:", err)
+		return
 	}
+	defer srcFile.Close()
+
+	scanner := bufio.NewScanner(srcFile)
+	lineCount := 0
+	fmt.Println("\nFile content (line by line):")
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+		lineCount++
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Println("Error during scanning file:", err)
+		return
+	}
+
+	fmt.Printf("\nTotal lines read: %d\n", lineCount)
+
+	// Копіювання файлу
+	copiedLines, err := copyLines(filename, copyFile)
+	if err != nil {
+		fmt.Println("Error copying file:", err)
+		return
+	}
+	fmt.Printf("Data copied successfully to %s (%d lines)\n", copyFile, copiedLines)
 }

@@ -1,71 +1,40 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
-
-	_ "github.com/go-sql-driver/mysql"
+	"net/http"
 )
 
 func main() {
-	// --- 1. Підключення до бази даних ---
-	// Якщо ти в XAMPP і пароль порожній — прибери "1234"
-	connStr := "root:@tcp(127.0.0.1:3306)/queue_db"
+	// Обробник головної сторінки
+	http.Handle("/", http.FileServer(http.Dir("static")))
 
-	db, err := sql.Open("mysql", connStr)
-	if err != nil {
-		log.Fatalf("Connection error: %v\n", err)
-	}
-	defer db.Close()
+	// Обробник для форми /submit
+	http.HandleFunc("/submit", submitHandler)
 
-	// Перевірка з'єднання
-	err = db.Ping()
-	if err != nil {
-		log.Fatalf("No connection with database: %v\n", err)
-	}
-	fmt.Println("Connection established!")
+	fmt.Println("Server launched at http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}
 
-	// --- 2. Створення таблиці ---
-	createTable := `
-	CREATE TABLE IF NOT EXISTS queue (
-		id INT AUTO_INCREMENT PRIMARY KEY,
-		client_name VARCHAR(100),
-		service_type VARCHAR(50),
-		ticket_number INT
-	);
-	`
-	_, err = db.Exec(createTable)
-	if err != nil {
-		log.Fatalf("Error ocured during table creation: %v\n", err)
-	}
-	fmt.Println("Table 'queue' successfully created!")
-
-	// --- 3. INSERT-запит ---
-	insertQuery := `INSERT INTO queue (client_name, service_type, ticket_number) VALUES (?, ?, ?)`
-
-	res, err := db.Exec(insertQuery, "Ivan Petrenko", "Communal services payment", 101)
-	if err != nil {
-		log.Fatalf("Insertion error: %v\n", err)
+// submitHandler приймає POST-запит і виводить дані у консоль
+func submitHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
 	}
 
-	newID, _ := res.LastInsertId()
-	fmt.Printf("Added new item with ID = %d\n", newID)
-
-	// --- 4. SELECT-запит ---
-	var (
-		clientName   string
-		serviceType  string
-		ticketNumber int
-	)
-
-	selectQuery := `SELECT client_name, service_type, ticket_number FROM queue WHERE id = ?`
-	err = db.QueryRow(selectQuery, newID).Scan(&clientName, &serviceType, &ticketNumber)
-	if err != nil {
-		log.Fatalf("Reading error: %v\n", err)
+	// Парсинг даних форми
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Form process error", http.StatusBadRequest)
+		return
 	}
 
-	fmt.Println("Received data:")
-	fmt.Printf("Client: %s | Service: %s | Ticket: %d\n",
-		clientName, serviceType, ticketNumber)
+	username := r.PostFormValue("username")
+
+	// Вивід у консоль (імітація запису користувача в електронну чергу)
+	fmt.Println("Recieved new user:", username)
+
+	// Відповідь користувачу
+	fmt.Fprintf(w, "Thanks, %s! You were registered into queue successfully.", username)
 }

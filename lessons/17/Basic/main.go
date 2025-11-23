@@ -7,34 +7,21 @@ import (
 )
 
 func main() {
-	// Обробник головної сторінки
-	http.Handle("/", http.FileServer(http.Dir("static")))
+	// Реєстрація базового обробника для кореневого шляху "/"
+	http.HandleFunc("/", rootHandler)
 
-	// Обробник для форми /submit
-	http.HandleFunc("/submit", submitHandler)
+	// Інформаційне повідомлення в консолі
+	fmt.Println("Server deployed at 8081...")
 
-	fmt.Println("Server launched at http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	// Запуск HTTP-сервера на порту 8081 з обробкою можливих помилок
+	err := http.ListenAndServe(":8081", nil)
+	if err != nil {
+		log.Fatal("Error at server deployment:", err)
+	}
 }
 
-// submitHandler приймає POST-запит і виводить дані у консоль
-func submitHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// Парсинг даних форми
-	if err := r.ParseForm(); err != nil {
-		http.Error(w, "Form process error", http.StatusBadRequest)
-		return
-	}
-
-	username := r.PostFormValue("username")
-
-	// Вивід у консоль (імітація запису користувача в електронну чергу)
-	fmt.Println("Recieved new user:", username)
-
-	// Відповідь користувачу
-	fmt.Fprintf(w, "Thanks, %s! You were registered into queue successfully.", username)
+// Обробник для кореневого маршруту "/"
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+	// Відправляємо просте текстове повідомлення у відповідь клієнту
+	fmt.Fprintln(w, "Server is running")
 }

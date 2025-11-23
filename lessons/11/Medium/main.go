@@ -1,49 +1,32 @@
 package main
 
+/*
+#include <string.h> // Потрібно для strlen
+#include <stdlib.h> // Потрібно для free
+*/
+import "C"
+
 import (
 	"fmt"
-	"sync"
-	"time"
+	"unsafe"
 )
 
-// sensorWorker імітує датчик, який надсилає кількість клієнтів у черзі
-func sensorWorker(id int, dataCh chan int, wg *sync.WaitGroup) {
-	defer wg.Done() // сигналізуємо про завершення goroutine
-
-	for i := 1; i <= 4; i++ {
-		value := id*10 + i // наприклад, унікальне значення від кожного датчика
-		dataCh <- value
-		fmt.Printf("Counter #%d: sent value %d\n", id, value)
-		time.Sleep(300 * time.Millisecond) // імітація затримки між відправленнями
-	}
-	fmt.Printf("Counter #%d: finished work\n", id)
-}
-
 func main() {
-	// Створення буферизованого каналу розміром 5 для передачі цілих чисел
-	dataCh := make(chan int, 5)
+	fmt.Println("E-Queue")
+	fmt.Println("C-Function with String transfer\n")
 
-	// Використання WaitGroup для синхронізації трьох goroutines
-	var wg sync.WaitGroup
-	wg.Add(3)
+	// Go-рядок, який символічно представляє ідентифікатор клієнта в черзі
+	clientName := "client_1024"
 
-	// Запуск трьох датчиків (goroutines)
-	for i := 1; i <= 3; i++ {
-		go sensorWorker(i, dataCh, &wg)
-	}
+	// Конвертація Go-рядка у C-рядок
+	cStr := C.CString(clientName)
+	// Обов’язкове звільнення пам’яті після використання
+	defer C.free(unsafe.Pointer(cStr))
 
-	// Гороутина-агрегатор (головна) читає всі значення з каналу
-	go func() {
-		wg.Wait()     // чекаємо завершення всіх датчиків
-		close(dataCh) // після завершення — закриваємо канал
-	}()
+	// Виклик стандартної C-функції strlen
+	length := C.strlen(cStr)
 
-	fmt.Println("[Agregator] Waiting for data ...")
-
-	// Читаємо значення з каналу за допомогою for range
-	for value := range dataCh {
-		fmt.Printf("[Agregator] reciewed data %d\n", value)
-	}
-
-	fmt.Println("Work finished! Channel closed!")
+	// Вивід результату в Go
+	fmt.Printf("Client: %s\n", clientName)
+	fmt.Printf("Symbol amount in ID: %d\n", int(length))
 }

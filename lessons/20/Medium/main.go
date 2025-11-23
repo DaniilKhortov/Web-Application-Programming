@@ -1,90 +1,57 @@
 package main
 
 import (
-	"fmt"
-	"html/template"
+	"encoding/json"
 	"log"
 	"net/http"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
-type QueueItem struct {
-	Number int
-	Name   string
+// Metric описує структуру метрики для веб-додатку
+type Metric struct {
+	Name  string  `json:"name"`  // Назва метрики
+	Value float64 `json:"value"` // Значення метрики
 }
 
-func queueHandler(w http.ResponseWriter, r *http.Request) {
-	queue := []QueueItem{
-		{1, "Olena"},
-		{2, "Dmytro"},
-		{3, "Katheryna"},
-		{4, "Alexij"},
-	}
-
-	tmpl, err := template.ParseFiles("templates/queue.html")
-	if err != nil {
-		http.Error(w, "Template error: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	err = tmpl.Execute(w, queue)
-	if err != nil {
-		http.Error(w, "Template parsing error: "+err.Error(), http.StatusInternalServerError)
-	}
-}
-
-func registerHandler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodGet:
-		// Показуємо форму
-		tmpl, err := template.ParseFiles("templates/register.html")
-		if err != nil {
-			http.Error(w, "Template error: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-		tmpl.Execute(w, nil)
-
-	case http.MethodPost:
-		// Обробка відправлених даних
-		username := r.FormValue("username")
-		password := r.FormValue("password")
-
-		if username == "" || password == "" {
-			http.Error(w, "Fill all the fields!", http.StatusBadRequest)
-			return
-		}
-
-		// Хешуємо пароль через bcrypt
-		hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-		if err != nil {
-			http.Error(w, "Помилка хешування пароля", http.StatusInternalServerError)
-			return
-		}
-
-		// Виводимо в консоль ім’я користувача та хеш
-		fmt.Println("=== Registering user ===")
-		fmt.Println("Name:", username)
-		fmt.Println("Hashed password:", string(hash))
-		fmt.Println("=====================================")
-
-		// Відповідь користувачу
-		fmt.Fprintf(w, "Registration is successful!")
-	default:
-		http.Error(w, "Method is not supported", http.StatusMethodNotAllowed)
-	}
-}
+// Глобальний зріз для імітації сховища даних
+var metrics []Metric
 
 func main() {
-	http.HandleFunc("/", queueHandler)
-	http.HandleFunc("/register", registerHandler)
+	// Початкові статичні метрики
+	metrics = []Metric{
+		{Name: "waiting_clients", Value: 5},
+		{Name: "served_clients", Value: 12},
+		{Name: "average_wait_time", Value: 3.5},
+	}
 
-	port := 4430
-	fmt.Printf("Server is run on: https://localhost:%d\n", port)
-	fmt.Println("There may appear a warning due to the self-subscribed sertificate.")
+	// Обробник для GET та POST /metrics
+	http.HandleFunc("/metrics", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			// GET: повертаємо весь список метрик
+			w.Header().Set("Content-Type", "application/json")
+			if err := json.NewEncoder(w).Encode(metrics); err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
+		case http.MethodPost:
+			// POST: читаємо JSON з тіла запиту та додаємо нову метрику
+			var newMetric Metric
+			if err := json.NewDecoder(r.Body).Decode(&newMetric); err != nil {
+				http.Error(w, "Bad Request: "+err.Error(), http.StatusBadRequest)
+				return
+			}
 
-	err := http.ListenAndServeTLS(fmt.Sprintf(":%d", port), "server.crt", "server.key", nil)
-	if err != nil {
-		log.Fatalf("Server launch error: %v", err)
+			metrics = append(metrics, newMetric) // додаємо до глобального зрізу
+			w.WriteHeader(http.StatusCreated)    // 201 Created
+		default:
+			// Якщо інший метод
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})
+
+	// Запуск сервера
+	log.Println("Server started on http://localhost:8080")
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		log.Fatalf("Server failed: %v", err)
 	}
 }

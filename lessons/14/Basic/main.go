@@ -1,59 +1,70 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"strings"
+	"time"
 )
 
+// Структура для зберігання даних клієнта
+type Client struct {
+	Name      string
+	TicketNum int
+}
+
+// --- Етап 1: DataReader ---
+func DataReader(out chan<- Client) {
+	// Умовно вхідні дані (можна уявити, що вони прийшли з веб-форми)
+	input := []Client{
+		{"Michael", 1},
+		{"Maria", 2},
+		{"", 3},        // некоректне ім’я
+		{"Dmytro", -1}, // некоректний номер
+		{"Daryna", 4},
+	}
+
+	for _, client := range input {
+		fmt.Println("[Reader] Recieved record:", client)
+		out <- client
+		time.Sleep(300 * time.Millisecond) // імітація часу обробки
+	}
+	close(out)
+}
+
+// --- Етап 2: DataProcessor ---
+func DataProcessor(in <-chan Client) {
+	for client := range in {
+		if validate(client) {
+			fmt.Printf("[Processor] Client '%s' is registered as %d\n",
+				client.Name, client.TicketNum)
+		} else {
+			fmt.Printf("[Processor] Invalid data: %+v\n", client)
+		}
+		time.Sleep(200 * time.Millisecond)
+	}
+}
+
+// Функція валідації вхідних даних
+func validate(c Client) bool {
+	if strings.TrimSpace(c.Name) == "" {
+		return false
+	}
+	if c.TicketNum <= 0 {
+		return false
+	}
+	return true
+}
+
+// --- Основна функція ---
 func main() {
-	// Назва файлу для збереження черги
-	filename := "queue.txt"
+	fmt.Println("E-Queue")
 
-	// Створення або відкриття файлу для запису
-	file, err := os.Create(filename)
-	if err != nil {
-		fmt.Println("Error occured during file creation:", err)
-		return
-	}
-	// Гарантоване закриття файлу після завершення
-	defer file.Close()
+	// Канал для зв’язку між Reader та Processor
+	dataChan := make(chan Client)
 
-	// Створення буферизованого введення з консолі
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Enter client data (Name Surname ID).")
+	// Запуск етапів у окремих goroutines
+	go DataReader(dataChan)
+	DataProcessor(dataChan) // головна горутина чекає завершення обробки
 
-	for {
-		fmt.Print("Client: ")
-		text, _ := reader.ReadString('\n')
-
-		// 2. Очищаємо рядок від пробілів на початку/в кінці та символу \n
-		trimmedText := strings.TrimSpace(text)
-
-		// 3. Перевіряємо, чи рядок порожній
-		if trimmedText == "" {
-			break // Якщо так — виходимо з циклу
-		}
-
-		// Запис у файл потрібно робити з оригінальним рядком, щоб зберегти перехід на новий рядок
-		_, err := file.WriteString(text)
-		if err != nil {
-			fmt.Println("File writing error:", err)
-			return
-		}
-	}
-
-	fmt.Println("\nData was saved successfully:", filename)
-
-	// Зчитування всього вмісту файлу
-	content, err := os.ReadFile(filename)
-	if err != nil {
-		fmt.Println("File reading error:", err)
-		return
-	}
-
-	// Виведення даних на екран
-	fmt.Println("\nFile content:")
-	fmt.Println(string(content))
+	fmt.Println("Work is done!")
 }

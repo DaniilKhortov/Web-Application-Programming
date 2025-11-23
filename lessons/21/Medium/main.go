@@ -1,58 +1,108 @@
 package main
 
 import (
-	"encoding/json"
+	"database/sql"
 	"fmt"
-	"net/http"
+	"log"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
-// Post — структура, яка відповідає JSON-відповіді з API
-// https://jsonplaceholder.typicode.com/posts/1
-type Post struct {
-	UserID int    `json:"userId"`
-	ID     int    `json:"id"`
-	Title  string `json:"title"`
-	Body   string `json:"body"`
+// --- Структура для одного запису ---
+type Sensor struct {
+	ID       int
+	Name     string
+	Location string
 }
 
-// getPost виконує GET-запит до API, зчитує JSON і перетворює його у структуру Post
-func getPost(url string) (*Post, error) {
-	// Виконання GET-запиту
-	resp, err := http.Get(url)
+// --- Підключення до бази даних ---
+func connectDB() (*sql.DB, error) {
+	connStr := "root:@tcp(127.0.0.1:3306)/queue_db"
+	db, err := sql.Open("mysql", connStr)
 	if err != nil {
-		return nil, fmt.Errorf("request error: %v", err)
-	}
-	defer resp.Body.Close()
-
-	// Перевірка статус-коду відповіді
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected code: %d %s", resp.StatusCode, resp.Status)
+		return nil, fmt.Errorf("connection error: %v", err)
 	}
 
-	// Десеріалізація JSON у структуру
-	var post Post
-	err = json.NewDecoder(resp.Body).Decode(&post)
-	if err != nil {
-		return nil, fmt.Errorf("error ocured during JSON decode: %v", err)
+	if err = db.Ping(); err != nil {
+		return nil, fmt.Errorf("no connection with database: %v", err)
 	}
 
-	return &post, nil
+	return db, nil
 }
 
+// --- Функція створення таблиці (разова ініціалізація) ---
+func ensureTable(db *sql.DB) error {
+	createTable := `
+	CREATE TABLE IF NOT EXISTS sensors (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		name VARCHAR(100),
+		location VARCHAR(100)
+	);`
+	_, err := db.Exec(createTable)
+	return err
+}
+
+// --- Додавання нового сенсора ---
+func addSensor(db *sql.DB, name string, location string) error {
+	query := `INSERT INTO sensors (name, location) VALUES (?, ?)`
+	_, err := db.Exec(query, name, location)
+	if err != nil {
+		return fmt.Errorf("error ocured during insertion: %v", err)
+	}
+	fmt.Printf("Sensor '%s' (%s) added successfully.\n", name, location)
+	return nil
+}
+
+// --- Отримання всіх сенсорів ---
+func getSensors(db *sql.DB) ([]Sensor, error) {
+	query := `SELECT id, name, location FROM sensors`
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("SQL error: %v", err)
+	}
+	defer rows.Close()
+
+	var sensors []Sensor
+	for rows.Next() {
+		var s Sensor
+		if err := rows.Scan(&s.ID, &s.Name, &s.Location); err != nil {
+			return nil, fmt.Errorf("reading error: %v", err)
+		}
+		sensors = append(sensors, s)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error after reading: %v", err)
+	}
+
+	return sensors, nil
+}
+
+// --- Головна функція ---
 func main() {
-	url := "https://jsonplaceholder.typicode.com/posts/1"
-
-	// Викликаємо функцію отримання даних
-	post, err := getPost(url)
+	db, err := connectDB()
 	if err != nil {
-		fmt.Println("Error:", err)
-		return
+		log.Fatalf(" %v", err)
+	}
+	defer db.Close()
+	fmt.Println("Connection established!")
+
+	if err := ensureTable(db); err != nil {
+		log.Fatalf("Error ocured during table creation: %v", err)
 	}
 
-	// Виводимо окремі поля структури
-	fmt.Println("Data successfully receiwed")
-	fmt.Printf("ID of publication: %d\n", post.ID)
-	fmt.Printf("Author (UserID): %d\n", post.UserID)
-	fmt.Printf("Title: %s\n", post.Title)
-	fmt.Printf("Content:\n%s\n", post.Body)
+	// Додаємо кілька сенсорів
+	_ = addSensor(db, "Heat sensor", "Room №1")
+	_ = addSensor(db, "Humidity sensor", "Server room")
+	_ = addSensor(db, "Motion sensor", "Entrance")
+
+	// Отримуємо всі сенсори
+	sensors, err := getSensors(db)
+	if err != nil {
+		log.Fatalf(" %v", err)
+	}
+
+	fmt.Println("\nSensor list:")
+	for _, s := range sensors {
+		fmt.Printf("ID: %d | Name: %s | Location: %s\n", s.ID, s.Name, s.Location)
+	}
 }

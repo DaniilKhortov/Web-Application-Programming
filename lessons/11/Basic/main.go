@@ -1,35 +1,28 @@
 package main
 
-import (
-	"fmt"
-	"time"
-)
+/*
+#include <stdio.h>
 
-// sensorWorker імітує датчик потужності в системі електронної черги
-func sensorWorker(dataCh chan float64) {
-	power := 7.5
-	fmt.Println("Sending data (power)...")
-
-	// Надсилаємо дані у канал (блокується, якщо немає приймача)
-	dataCh <- power
-
-	fmt.Println("Data reciewed (power)")
+// Вбудована C-функція, яка приймає два int і повертає їхню суму
+int add(int a, int b) {
+    return a + b;
 }
+*/
+import "C"
+
+import "fmt"
 
 func main() {
-	// Створення небуферизованого каналу для передачі float64
-	dataCh := make(chan float64)
+	fmt.Println("E-Queue")
+	fmt.Println("Calling C-function via cgo\n")
 
-	// Запуск goroutine-датчика
-	go sensorWorker(dataCh)
+	// Припустимо, що у черзі 3 клієнти, і обслуговується ще 2
+	var queueCount int = 3
+	var servingNow int = 2
 
-	// Імітація затримки — приймач ще "не готовий"
-	fmt.Println("[Agregator] Waiting for data (2 seconds)...")
-	time.Sleep(2 * time.Second)
+	// Викликаємо C-функцію для підрахунку загальної кількості клієнтів
+	total := C.add(C.int(queueCount), C.int(servingNow))
 
-	// Приймання даних з каналу
-	powerValue := <-dataCh
-	fmt.Printf("[Agregator] reciewed power %.2f \n", powerValue)
-
-	fmt.Println("Work finished!")
+	// Виводимо результат (перетворюємо тип C.int у Go int)
+	fmt.Printf("General amount of clients in queue: %d\n", int(total))
 }

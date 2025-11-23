@@ -1,57 +1,44 @@
 package main
 
 import (
-	"encoding/json"
+	"html/template"
 	"log"
 	"net/http"
 )
 
-// Metric описує структуру метрики для веб-додатку
-type Metric struct {
-	Name  string  `json:"name"`  // Назва метрики
-	Value float64 `json:"value"` // Значення метрики
+// Структура для зберігання даних про сенсор
+type SensorData struct {
+	ID    string
+	Value float64
 }
 
-// Глобальний зріз для імітації сховища даних
-var metrics []Metric
-
 func main() {
-	// Початкові статичні метрики
-	metrics = []Metric{
-		{Name: "waiting_clients", Value: 5},
-		{Name: "served_clients", Value: 12},
-		{Name: "average_wait_time", Value: 3.5},
-	}
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		// Парсимо HTML-шаблон із файлу
+		tmpl, err := template.ParseFiles("templates/index.html")
+		if err != nil {
+			http.Error(w, "Template parse error", http.StatusInternalServerError)
+			log.Println("Template parse error:", err)
+			return
+		}
 
-	// Обробник для GET та POST /metrics
-	http.HandleFunc("/metrics", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			// GET: повертаємо весь список метрик
-			w.Header().Set("Content-Type", "application/json")
-			if err := json.NewEncoder(w).Encode(metrics); err != nil {
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-				return
-			}
-		case http.MethodPost:
-			// POST: читаємо JSON з тіла запиту та додаємо нову метрику
-			var newMetric Metric
-			if err := json.NewDecoder(r.Body).Decode(&newMetric); err != nil {
-				http.Error(w, "Bad Request: "+err.Error(), http.StatusBadRequest)
-				return
-			}
+		// Створюємо об’єкт SensorData з тестовими даними
+		data := SensorData{
+			ID:    "Sensor-001",
+			Value: 123.45,
+		}
 
-			metrics = append(metrics, newMetric) // додаємо до глобального зрізу
-			w.WriteHeader(http.StatusCreated)    // 201 Created
-		default:
-			// Якщо інший метод
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		// Виконуємо шаблон із передачею структури
+		err = tmpl.Execute(w, data)
+		if err != nil {
+			http.Error(w, "Template execute error", http.StatusInternalServerError)
+			log.Println("Template execute error:", err)
 		}
 	})
 
-	// Запуск сервера
-	log.Println("Server started on http://localhost:8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatalf("Server failed: %v", err)
+	log.Println("Server launched at http://localhost:8080")
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Fatal("Server launch error", err)
 	}
 }

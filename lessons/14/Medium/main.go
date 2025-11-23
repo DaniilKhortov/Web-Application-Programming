@@ -1,114 +1,93 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"strings"
+	"sync"
+	"time"
 )
 
-// Функція копіювання рядків з одного файлу в інший
-func copyLines(srcFile, dstFile string) (int, error) {
-	// Відкриваємо файл для читання
-	src, err := os.Open(srcFile)
-	if err != nil {
-		return 0, fmt.Errorf("cannot open source file: %v", err)
-	}
-	defer src.Close()
-
-	// Відкриваємо файл для запису
-	dst, err := os.Create(dstFile)
-	if err != nil {
-		return 0, fmt.Errorf("cannot create destination file: %v", err)
-	}
-	defer dst.Close()
-
-	scanner := bufio.NewScanner(src)
-	writer := bufio.NewWriter(dst)
-	defer writer.Flush()
-
-	lineCount := 0
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		// Тут можна додати фільтрацію, наприклад:
-		// if strings.Contains(line, "VIP") { ... }
-
-		_, err := writer.WriteString(line + "\n")
-		if err != nil {
-			return lineCount, fmt.Errorf("error writing to destination file: %v", err)
-		}
-		lineCount++
-	}
-
-	// Перевірка на помилки сканера
-	if err := scanner.Err(); err != nil {
-		return lineCount, fmt.Errorf("error reading source file: %v", err)
-	}
-
-	return lineCount, nil
+// Структура клієнта
+type Client struct {
+	ID        int
+	Name      string
+	TicketNum int
 }
 
+// Спільний ресурс — оброблені ID
+var (
+	ProcessedIDs []int
+	mu           sync.Mutex // захист від Data Race
+)
+
+// --- Етап 1: DataGenerator ---
+func DataGenerator(out chan<- Client) {
+	input := []Client{
+		{1, "Michael", 1},
+		{2, "Maria", 2},
+		{3, "", 3},        // некоректне ім’я
+		{4, "Dmytro", -1}, // некоректний номер
+		{5, "Daryna", 4},
+	}
+
+	for _, client := range input {
+		fmt.Printf("[Generator] Client sent: %+v\n", client)
+		out <- client
+		time.Sleep(200 * time.Millisecond)
+	}
+	close(out) // важливо: коректне закриття після завершення надсилання
+}
+
+// --- Етап 2: ParallelFilter (паралельна обробка) ---
+func ParallelFilter(id int, in <-chan Client, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	for client := range in {
+		if validate(client) {
+			mu.Lock()
+			ProcessedIDs = append(ProcessedIDs, client.ID)
+			mu.Unlock()
+			fmt.Printf("[Worker %d] Client '%s' is registered as %d\n",
+				id, client.Name, client.TicketNum)
+		} else {
+			fmt.Printf("[Worker %d] Invalid data: %+v\n", id, client)
+		}
+		time.Sleep(300 * time.Millisecond)
+	}
+}
+
+// --- Функція валідації ---
+func validate(c Client) bool {
+	if strings.TrimSpace(c.Name) == "" {
+		return false
+	}
+	if c.TicketNum <= 0 {
+		return false
+	}
+	return true
+}
+
+// --- Основна функція ---
 func main() {
-	filename := "queue.txt"
-	copyFile := "queue_copy.txt"
+	fmt.Println("E-Queue")
 
-	// Введення даних користувачем
-	file, err := os.Create(filename)
-	if err != nil {
-		fmt.Println("Error creating file:", err)
-		return
-	}
-	defer file.Close()
+	dataChan := make(chan Client)
+	var wg sync.WaitGroup
 
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Enter client data (Name Surname ID). Press Enter on empty line to finish:")
+	// Запускаємо генератор
+	go DataGenerator(dataChan)
 
-	for {
-		fmt.Print("Client: ")
-		text, _ := reader.ReadString('\n')
-		text = strings.TrimSpace(text)
-		if text == "" {
-			break
-		}
-
-		_, err := file.WriteString(text + "\n")
-		if err != nil {
-			fmt.Println("Error writing to file:", err)
-			return
-		}
+	// Запускаємо 3 паралельні обробники
+	numWorkers := 3
+	wg.Add(numWorkers)
+	for i := 1; i <= numWorkers; i++ {
+		go ParallelFilter(i, dataChan, &wg)
 	}
 
-	fmt.Println("\nData saved successfully to", filename)
+	wg.Wait()
 
-	// Читання файлу построчно
-	srcFile, err := os.Open(filename)
-	if err != nil {
-		fmt.Println("Error opening file for reading:", err)
-		return
-	}
-	defer srcFile.Close()
-
-	scanner := bufio.NewScanner(srcFile)
-	lineCount := 0
-	fmt.Println("\nFile content (line by line):")
-	for scanner.Scan() {
-		fmt.Println(scanner.Text())
-		lineCount++
-	}
-
-	if err := scanner.Err(); err != nil {
-		fmt.Println("Error during scanning file:", err)
-		return
-	}
-
-	fmt.Printf("\nTotal lines read: %d\n", lineCount)
-
-	// Копіювання файлу
-	copiedLines, err := copyLines(filename, copyFile)
-	if err != nil {
-		fmt.Println("Error copying file:", err)
-		return
-	}
-	fmt.Printf("Data copied successfully to %s (%d lines)\n", copyFile, copiedLines)
+	fmt.Println("\nAll client served!")
+	mu.Lock()
+	fmt.Println("ID of clients after check:", ProcessedIDs)
+	mu.Unlock()
 }
