@@ -94,7 +94,7 @@ func sliceStat(arr []float64) (sum, avg, min, max float64, count int) {
 }
 
 // Функція safeRun використовується для обробки виключень
-// defer переносить спрацювання виключення функції на початок
+// defer відкладає спрацювання виключення функції до закінчення роботи основної функції
 func safeRun(fn func()) {
 	defer func() {
 		if r := recover(); r != nil {
