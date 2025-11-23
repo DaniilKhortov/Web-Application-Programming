@@ -177,7 +177,7 @@ func mainLogic() {
 	fmt.Printf("Total paid: %.2f UAH\nAverage: %.2f UAH\nMin: %.2f\nMax: %.2f UAH\nCount: %d\n",
 		sum, avg, min, max, count)
 
-	//Вивід ієрархії компанії як дерева
+	//Вивід ієрархії компанії як дерево
 	fmt.Println("\nCompany hierarchy:")
 	fmt.Println("---------------------------------------------")
 	hierarchy := map[string][]string{
