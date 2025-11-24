@@ -1,4 +1,3 @@
-// file: main.go
 package main
 
 import (
@@ -7,31 +6,28 @@ import (
 	"time"
 )
 
-// ElectronicQueue — модель черги обслуговування клієнтів
 type ElectronicQueue struct {
 	value int
 	mu    sync.RWMutex
 }
 
-// Get — читає поточне значення (імітація читання з бази)
 func (q *ElectronicQueue) Get(id int) int {
-	q.mu.RLock() // дозволяє одночасне читання
+	q.mu.RLock()
 	defer q.mu.RUnlock()
 
 	fmt.Printf("[Reader %02d] Reading: %d\n", id, q.value)
-	time.Sleep(10 * time.Millisecond) // імітація часу запиту (повільне читання)
+	time.Sleep(10 * time.Millisecond)
 	return q.value
 }
 
-// Update — оновлює значення (імітація запису)
 func (q *ElectronicQueue) Update(id int) {
-	q.mu.Lock() // ексклюзивний доступ — блокує всіх читачів і писців
+	q.mu.Lock()
 	defer q.mu.Unlock()
 
 	old := q.value
 	q.value++
 	fmt.Printf("[Writer %02d] Updating %d into %d\n", id, old, q.value)
-	time.Sleep(50 * time.Millisecond) // імітація тривалого запису
+	time.Sleep(50 * time.Millisecond)
 }
 
 func main() {
@@ -43,7 +39,6 @@ func main() {
 
 	fmt.Printf("Running %d readers and %d writers to serve clients simulteniosly.\n\n", readers, writers)
 
-	// Стартуємо всі читачі
 	for i := 0; i < readers; i++ {
 		wg.Add(1)
 		go func(id int) {
@@ -52,7 +47,6 @@ func main() {
 		}(i + 1)
 	}
 
-	// Стартуємо всі писці
 	for i := 0; i < writers; i++ {
 		wg.Add(1)
 		go func(id int) {

@@ -5,37 +5,28 @@ import (
 	"time"
 )
 
-// ---------- ІНТЕРФЕЙСНА ІЄРАРХІЯ ----------
-
-// Queueable — базовий інтерфейс (додавання, отримання, підрахунок)
 type Queueable interface {
 	AddClient(name string)
 	NextClient() string
 	Count() int
 }
 
-// Monitorable — інтерфейс спостереження за чергою
 type Monitorable interface {
 	Peek() string
 	GetAll() []string
 }
 
-// Loggable — інтерфейс журналювання
 type Loggable interface {
 	LogAction(action string)
 	GetLog() []string
 }
 
-// AdvancedQueue — складений (ієрархічний) інтерфейс
-// Включає Queueable, Monitorable і Loggable
 type AdvancedQueue interface {
 	Queueable
 	Monitorable
 	Loggable
 	fmt.Stringer
 }
-
-// ---------- БАЗОВИЙ КОМПОЗИТНИЙ ТИП ----------
 
 type BaseQueue struct {
 	clients []string
@@ -73,8 +64,6 @@ func (b *BaseQueue) GetAll() []string {
 	return b.clients
 }
 
-// ---------- ЖУРНАЛЮВАННЯ ----------
-
 func (b *BaseQueue) LogAction(action string) {
 	entry := fmt.Sprintf("[%s] %s", time.Now().Format("15:04:05"), action)
 	b.logs = append(b.logs, entry)
@@ -84,8 +73,6 @@ func (b *BaseQueue) GetLog() []string {
 	return b.logs
 }
 
-// ---------- РЕАЛІЗАЦІЯ №1: Звичайна черга ----------
-
 type SimpleQueue struct {
 	BaseQueue
 }
@@ -93,8 +80,6 @@ type SimpleQueue struct {
 func (s SimpleQueue) String() string {
 	return fmt.Sprintf("SimpleQueue (%d clients)", s.Count())
 }
-
-// ---------- РЕАЛІЗАЦІЯ №2: Пріоритетна черга ----------
 
 type PriorityQueue struct {
 	BaseQueue
@@ -137,9 +122,6 @@ func (p PriorityQueue) String() string {
 		len(p.priorityClients), len(p.clients))
 }
 
-// ---------- ВИКОРИСТАННЯ ПОРОЖНЬОГО ІНТЕРФЕЙСУ ----------
-
-// PrintAnyQueueInfo — приймає будь-який тип (interface{})
 func PrintAnyQueueInfo(obj interface{}) {
 	switch v := obj.(type) {
 	case AdvancedQueue:
@@ -156,8 +138,6 @@ func PrintAnyQueueInfo(obj interface{}) {
 	}
 }
 
-// ---------- ГОЛОВНА ПРОГРАМА ----------
-
 func main() {
 	sq := &SimpleQueue{}
 	pq := &PriorityQueue{}
@@ -167,14 +147,12 @@ func main() {
 	pq.AddClient("!Andriy")
 	pq.AddClient("Sosza")
 
-	// Ієрархічна робота через AdvancedQueue
 	var queues []AdvancedQueue = []AdvancedQueue{sq, pq}
 
 	for _, q := range queues {
 		q.NextClient()
 	}
 
-	// Використання порожнього інтерфейсу
 	fmt.Println("\nEmpty interface output:")
 	PrintAnyQueueInfo(sq)
 	fmt.Println()

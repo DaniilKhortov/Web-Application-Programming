@@ -8,20 +8,16 @@ import (
 	"github.com/fatih/color"
 )
 
-// queue — приватна змінна (черга в пам’яті)
 var queue []models.QueueItem
 
-// counter — приватний лічильник клієнтів
 var counter int
 
-// init() викликається автоматично при завантаженні пакету services.
 func init() {
 	color.Blue("Initializing gueue")
 	queue = []models.QueueItem{}
 	counter = 0
 }
 
-// AddClient додає нового клієнта у чергу.
 func AddClient(name string) {
 	counter++
 	item := models.QueueItem{
@@ -35,7 +31,6 @@ func AddClient(name string) {
 	utils.PrintDivider()
 }
 
-// ShowQueue показує поточну чергу.
 func ShowQueue() {
 	if len(queue) == 0 {
 		color.Yellow("Queue is empty.")
@@ -52,7 +47,6 @@ func ShowQueue() {
 	utils.PrintDivider()
 }
 
-// ServeNext обслуговує наступного клієнта.
 func ServeNext() {
 	if len(queue) == 0 {
 		color.Red("No one to serve")

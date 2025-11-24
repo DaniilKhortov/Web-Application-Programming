@@ -8,14 +8,12 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// --- Структура для одного запису ---
 type Sensor struct {
 	ID       int
 	Name     string
 	Location string
 }
 
-// --- Підключення до бази даних ---
 func connectDB() (*sql.DB, error) {
 	connStr := "root:@tcp(127.0.0.1:3306)/queue_db"
 	db, err := sql.Open("mysql", connStr)
@@ -30,7 +28,6 @@ func connectDB() (*sql.DB, error) {
 	return db, nil
 }
 
-// --- Функція створення таблиці (разова ініціалізація) ---
 func ensureTable(db *sql.DB) error {
 	createTable := `
 	CREATE TABLE IF NOT EXISTS sensors (
@@ -42,7 +39,6 @@ func ensureTable(db *sql.DB) error {
 	return err
 }
 
-// --- Додавання нового сенсора ---
 func addSensor(db *sql.DB, name string, location string) error {
 	query := `INSERT INTO sensors (name, location) VALUES (?, ?)`
 	_, err := db.Exec(query, name, location)
@@ -53,7 +49,6 @@ func addSensor(db *sql.DB, name string, location string) error {
 	return nil
 }
 
-// --- Отримання всіх сенсорів ---
 func getSensors(db *sql.DB) ([]Sensor, error) {
 	query := `SELECT id, name, location FROM sensors`
 	rows, err := db.Query(query)
@@ -77,7 +72,6 @@ func getSensors(db *sql.DB) ([]Sensor, error) {
 	return sensors, nil
 }
 
-// --- Головна функція ---
 func main() {
 	db, err := connectDB()
 	if err != nil {
@@ -90,12 +84,10 @@ func main() {
 		log.Fatalf("Error ocured during table creation: %v", err)
 	}
 
-	// Додаємо кілька сенсорів
 	_ = addSensor(db, "Heat sensor", "Room №1")
 	_ = addSensor(db, "Humidity sensor", "Server room")
 	_ = addSensor(db, "Motion sensor", "Entrance")
 
-	// Отримуємо всі сенсори
 	sensors, err := getSensors(db)
 	if err != nil {
 		log.Fatalf(" %v", err)

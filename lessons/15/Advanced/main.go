@@ -8,7 +8,6 @@ import (
 	"time"
 )
 
-// Функція для копіювання файлу блоками та підрахунку байтів
 func copyLargeFile(srcFile, dstFile string, bufSize int) (int64, error) {
 	src, err := os.Open(srcFile)
 	if err != nil {
@@ -55,7 +54,6 @@ func main() {
 	copyFile := "queue_large_copy.txt"
 	bufSize := 1024 * 16 // 16 KB блок
 
-	// Введення даних користувачем
 	file, err := os.Create(filename)
 	if err != nil {
 		fmt.Println("Error creating file:", err)
@@ -83,7 +81,6 @@ func main() {
 
 	fmt.Println("\nData saved successfully to", filename)
 
-	// Читання великих файлів блочно
 	fmt.Println("\nStarting to copy large file...")
 	totalBytes, err := copyLargeFile(filename, copyFile, bufSize)
 	if err != nil {

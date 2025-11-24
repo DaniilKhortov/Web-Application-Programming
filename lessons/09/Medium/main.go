@@ -4,36 +4,27 @@ import (
 	"fmt"
 )
 
-// ---------- ІНТЕРФЕЙСИ ----------
-
-// Queueable — базовий інтерфейс черги
 type Queueable interface {
 	AddClient(name string)
 	NextClient() string
 	Count() int
 }
 
-// Monitorable — додатковий інтерфейс моніторингу черги
 type Monitorable interface {
-	Peek() string     // Подивитися наступного
-	GetAll() []string // Отримати всіх клієнтів
+	Peek() string
+	GetAll() []string
 }
 
-// FullQueue — складений інтерфейс
 type FullQueue interface {
 	Queueable
 	Monitorable
 	fmt.Stringer
 }
 
-// ---------- БАЗОВА КОМПОЗИЦІЯ ----------
-
-// BaseQueue — композитний тип з приватними полями
 type BaseQueue struct {
 	clients []string
 }
 
-// Публічні методи для інкапсульованих даних
 func (b *BaseQueue) AddClient(name string) {
 	b.clients = append(b.clients, name)
 }
@@ -62,9 +53,6 @@ func (b *BaseQueue) GetAll() []string {
 	return b.clients
 }
 
-// ---------- РЕАЛІЗАЦІЇ ІНТЕРФЕЙСУ ----------
-
-// SimpleQueue — звичайна черга, вбудовує BaseQueue
 type SimpleQueue struct {
 	BaseQueue
 }
@@ -73,7 +61,6 @@ func (s SimpleQueue) String() string {
 	return fmt.Sprintf("SimpleQueue (%d clients)", s.Count())
 }
 
-// PriorityQueue — черга з пріоритетами, також вбудовує BaseQueue
 type PriorityQueue struct {
 	BaseQueue
 	priorityClients []string
@@ -112,15 +99,11 @@ func (p PriorityQueue) String() string {
 		len(p.priorityClients), len(p.clients))
 }
 
-// ---------- ФУНКЦІЇ ----------
-
-// ServeAll — демонструє поліморфізм через зріз інтерфейсів
 func ServeAll(queues []FullQueue) {
 	for _, q := range queues {
 		fmt.Println("Current queue:", q)
 		fmt.Println("Servicing:", q.NextClient())
 
-		// Type switch для різних типів черг
 		switch v := q.(type) {
 		case *SimpleQueue:
 			fmt.Println("Clients in SimpleQueue left:", v.Count())
@@ -135,8 +118,6 @@ func ServeAll(queues []FullQueue) {
 	}
 }
 
-// ---------- MAIN ----------
-
 func main() {
 	sq := &SimpleQueue{}
 	pq := &PriorityQueue{}
@@ -146,7 +127,6 @@ func main() {
 	pq.AddClient("!Andriy")
 	pq.AddClient("Sosza")
 
-	// Масив інтерфейсів — поліморфізм через зріз
 	queues := []FullQueue{sq, pq}
 
 	ServeAll(queues)

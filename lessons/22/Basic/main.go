@@ -7,7 +7,6 @@ import (
 	"net/http"
 )
 
-// QueueItem — структура клієнта у черзі
 type QueueItem struct {
 	Number int
 	Name   string
@@ -21,7 +20,6 @@ func queueHandler(w http.ResponseWriter, r *http.Request) {
 		{4, "Alexij"},
 	}
 
-	// Завантажуємо шаблон із файлу
 	tmpl, err := template.ParseFiles("templates/queue.html")
 	if err != nil {
 		http.Error(w, "Template error: "+err.Error(), http.StatusInternalServerError)
@@ -41,7 +39,6 @@ func main() {
 	fmt.Printf("Server is run on: https://localhost:%d\n", port)
 	fmt.Println("There may appear a warning due to the self-subscribed sertificate.")
 
-	// HTTPS-сервер із самопідписаним сертифікатом
 	err := http.ListenAndServeTLS(fmt.Sprintf(":%d", port), "server.crt", "server.key", nil)
 	if err != nil {
 		log.Fatalf("Server launch error: %v", err)

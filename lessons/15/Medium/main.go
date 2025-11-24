@@ -7,16 +7,14 @@ import (
 	"strings"
 )
 
-// Функція копіювання рядків з одного файлу в інший
 func copyLines(srcFile, dstFile string) (int, error) {
-	// Відкриваємо файл для читання
+
 	src, err := os.Open(srcFile)
 	if err != nil {
 		return 0, fmt.Errorf("cannot open source file: %v", err)
 	}
 	defer src.Close()
 
-	// Відкриваємо файл для запису
 	dst, err := os.Create(dstFile)
 	if err != nil {
 		return 0, fmt.Errorf("cannot create destination file: %v", err)
@@ -31,8 +29,6 @@ func copyLines(srcFile, dstFile string) (int, error) {
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		// Тут можна додати фільтрацію, наприклад:
-		// if strings.Contains(line, "VIP") { ... }
 
 		_, err := writer.WriteString(line + "\n")
 		if err != nil {
@@ -41,7 +37,6 @@ func copyLines(srcFile, dstFile string) (int, error) {
 		lineCount++
 	}
 
-	// Перевірка на помилки сканера
 	if err := scanner.Err(); err != nil {
 		return lineCount, fmt.Errorf("error reading source file: %v", err)
 	}
@@ -53,7 +48,6 @@ func main() {
 	filename := "queue.txt"
 	copyFile := "queue_copy.txt"
 
-	// Введення даних користувачем
 	file, err := os.Create(filename)
 	if err != nil {
 		fmt.Println("Error creating file:", err)
@@ -81,7 +75,6 @@ func main() {
 
 	fmt.Println("\nData saved successfully to", filename)
 
-	// Читання файлу построчно
 	srcFile, err := os.Open(filename)
 	if err != nil {
 		fmt.Println("Error opening file for reading:", err)
@@ -104,7 +97,6 @@ func main() {
 
 	fmt.Printf("\nTotal lines read: %d\n", lineCount)
 
-	// Копіювання файлу
 	copiedLines, err := copyLines(filename, copyFile)
 	if err != nil {
 		fmt.Println("Error copying file:", err)

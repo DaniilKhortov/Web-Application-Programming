@@ -4,14 +4,12 @@ import (
 	"fmt"
 )
 
-// Queueable — інтерфейс для електронної черги
 type Queueable interface {
 	AddClient(name string)
 	NextClient() string
 	Count() int
 }
 
-// ---- Реалізація 1: Звичайна черга ----
 type SimpleQueue struct {
 	clients []string
 }
@@ -34,7 +32,6 @@ func (q *SimpleQueue) Count() int {
 	return len(q.clients)
 }
 
-// ---- Реалізація 2: Пріоритетна черга ----
 type PriorityQueue struct {
 	priorityClients []string
 	normalClients   []string
@@ -42,7 +39,7 @@ type PriorityQueue struct {
 
 func (pq *PriorityQueue) AddClient(name string) {
 	if len(name) > 0 && name[0] == '!' {
-		pq.priorityClients = append(pq.priorityClients, name[1:]) // '!' = пріоритет
+		pq.priorityClients = append(pq.priorityClients, name[1:])
 		fmt.Printf("High priority Client %s added\n", name[1:])
 	} else {
 		pq.normalClients = append(pq.normalClients, name)
@@ -68,17 +65,14 @@ func (pq *PriorityQueue) Count() int {
 	return len(pq.priorityClients) + len(pq.normalClients)
 }
 
-// ---- Реалізація fmt.Stringer ----
 func (pq PriorityQueue) String() string {
 	return fmt.Sprintf("PriorityQueue: %d high priority, %d common clients",
 		len(pq.priorityClients), len(pq.normalClients))
 }
 
-// ---- Функція, що приймає інтерфейс ----
 func ServeNext(q Queueable) {
 	fmt.Println("Servicing:", q.NextClient())
 
-	// Використання type assertion
 	switch v := q.(type) {
 	case *SimpleQueue:
 		fmt.Printf("Clients in SimpleQueue left: %d\n", v.Count())
@@ -89,7 +83,6 @@ func ServeNext(q Queueable) {
 	}
 }
 
-// ---- Основна функція ----
 func main() {
 	sq := &SimpleQueue{}
 	pq := &PriorityQueue{}

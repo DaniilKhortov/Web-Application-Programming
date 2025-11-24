@@ -10,26 +10,20 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// Sensor — модель даних (структура для таблиці sensors)
 type Sensor struct {
 	ID       int    `json:"id"`
 	Name     string `json:"name"`
 	Location string `json:"location"`
 }
 
-// Глобальна змінна для доступу до бази
 var db *sql.DB
 
-// --- ФУНКЦІЇ РОБОТИ З БАЗОЮ ---
-
-// addSensor додає новий сенсор у БД
 func addSensor(name string, location string) error {
 	query := `INSERT INTO sensors (name, location) VALUES (?, ?)`
 	_, err := db.Exec(query, name, location)
 	return err
 }
 
-// getSensors повертає всі сенсори з бази
 func getSensors() ([]Sensor, error) {
 	rows, err := db.Query(`SELECT id, name, location FROM sensors`)
 	if err != nil {
@@ -48,9 +42,6 @@ func getSensors() ([]Sensor, error) {
 	return sensors, nil
 }
 
-// --- HTTP HANDLERS ---
-
-// handleAddSensor — POST /sensors
 func handleAddSensor(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
@@ -63,7 +54,6 @@ func handleAddSensor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Простенька валідація
 	if s.Name == "" || s.Location == "" {
 		http.Error(w, "Field 'name' and 'location' are obligatory", http.StatusBadRequest)
 		return
@@ -78,7 +68,6 @@ func handleAddSensor(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, `{"message": "Sensor added"}`)
 }
 
-// handleGetSensors — GET /sensors
 func handleGetSensors(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method is not allowed", http.StatusMethodNotAllowed)
@@ -95,10 +84,8 @@ func handleGetSensors(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(sensors)
 }
 
-// --- MAIN ---
-
 func main() {
-	// --- 1. Підключення до бази MySQL ---
+
 	var err error
 	dsn := "root:@tcp(127.0.0.1:3306)/queue_db"
 	db, err = sql.Open("mysql", dsn)
@@ -112,7 +99,6 @@ func main() {
 	}
 	fmt.Println("Connection established!")
 
-	// --- 2. Створення таблиці (якщо ще нема) ---
 	createTable := `
 	CREATE TABLE IF NOT EXISTS sensors (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -124,7 +110,6 @@ func main() {
 	}
 	fmt.Println("Table 'sensors' successfully created.")
 
-	// --- 3. Налаштування HTTP-сервера ---
 	http.HandleFunc("/sensors", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:

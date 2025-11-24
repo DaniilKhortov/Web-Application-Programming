@@ -8,28 +8,25 @@ import (
 	"time"
 )
 
-// --- Структура даних ---
 type Client struct {
 	ID        int
 	Name      string
 	TicketNum int
 }
 
-// --- Глобальні структури ---
 type Result struct {
 	Client  Client
 	Message string
 }
 
-// --- Етап 1: DataGenerator ---
 func DataGenerator(out chan<- Client, errCh chan<- error, done chan struct{}) {
 	defer close(out)
 
 	input := []Client{
 		{1, "Michael", 1},
 		{2, "Maria", 2},
-		{3, "", 3},        // некоректне ім’я
-		{4, "Dmytro", -1}, // некоректний номер
+		{3, "", 3},
+		{4, "Dmytro", -1},
 		{5, "Daryna", 4},
 	}
 
@@ -46,7 +43,6 @@ func DataGenerator(out chan<- Client, errCh chan<- error, done chan struct{}) {
 	}
 }
 
-// --- Етап 2: Validator ---
 func Validator(in <-chan Client, out chan<- Client, errCh chan<- error, done chan struct{}) {
 	defer close(out)
 
@@ -59,7 +55,7 @@ func Validator(in <-chan Client, out chan<- Client, errCh chan<- error, done cha
 			if !validate(client) {
 				err := errors.New(fmt.Sprintf("Invalid clients data: %+v", client))
 				errCh <- err
-				return // негайно завершуємо конвеєр
+				return //
 			}
 			fmt.Printf("[Validator] Data is correct: %+v\n", client)
 			out <- client
@@ -68,7 +64,6 @@ func Validator(in <-chan Client, out chan<- Client, errCh chan<- error, done cha
 	}
 }
 
-// --- Етап 3: Aggregator ---
 func Aggregator(in <-chan Client, results chan<- Result, errCh chan<- error, done chan struct{}) {
 	defer close(results)
 
@@ -86,7 +81,6 @@ func Aggregator(in <-chan Client, results chan<- Result, errCh chan<- error, don
 	}
 }
 
-// --- Валідація ---
 func validate(c Client) bool {
 	if strings.TrimSpace(c.Name) == "" {
 		return false
@@ -97,7 +91,6 @@ func validate(c Client) bool {
 	return true
 }
 
-// --- Основна функція ---
 func main() {
 	fmt.Println("E-Queue")
 
@@ -110,7 +103,6 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(3)
 
-	// Запуск етапів
 	go func() {
 		defer wg.Done()
 		DataGenerator(dataCh, errCh, done)
@@ -126,18 +118,16 @@ func main() {
 		Aggregator(validCh, resultsCh, errCh, done)
 	}()
 
-	// Горутина для виводу результатів
 	go func() {
 		for res := range resultsCh {
 			fmt.Printf("[Result] %s\n", res.Message)
 		}
 	}()
 
-	// Основний select: очікування помилки або завершення
 	select {
 	case err := <-errCh:
 		fmt.Println("\n[Main] Recieved error:", err)
-		close(done) // сигнал усім етапам завершитись
+		close(done)
 	case <-time.After(5 * time.Second):
 		fmt.Println("\n[Main] Work is done without error!")
 		close(done)

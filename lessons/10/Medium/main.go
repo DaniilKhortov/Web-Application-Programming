@@ -6,16 +6,13 @@ import (
 	"time"
 )
 
-// Функція, що імітує обслуговування клієнта
 func serveClient(id int, wg *sync.WaitGroup, mu *sync.Mutex, results map[int]string) {
 	defer wg.Done()
 
 	fmt.Printf("Goroutine %d starting (client in queue)\n", id)
 
-	// Імітація обробки запиту клієнта
 	time.Sleep(time.Duration(100+id*10) * time.Millisecond)
 
-	// Критична секція — запис у спільну мапу результатів
 	mu.Lock()
 	results[id] = fmt.Sprintf("client %d served at %v", id, time.Now().Format("15:04:05.000"))
 	mu.Unlock()
@@ -27,9 +24,9 @@ func main() {
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 
-	results := make(map[int]string) // спільна мапа результатів
+	results := make(map[int]string)
 
-	numClients := 8 // можна змінити від 5 до 10
+	numClients := 8
 
 	wg.Add(numClients)
 

@@ -6,7 +6,6 @@ import (
 	"net/http"
 )
 
-// Структура для зберігання даних про сенсор
 type SensorData struct {
 	ID    string
 	Value float64
@@ -14,7 +13,7 @@ type SensorData struct {
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// Парсимо HTML-шаблон із файлу
+
 		tmpl, err := template.ParseFiles("templates/index.html")
 		if err != nil {
 			http.Error(w, "Template parse error", http.StatusInternalServerError)
@@ -22,13 +21,11 @@ func main() {
 			return
 		}
 
-		// Створюємо об’єкт SensorData з тестовими даними
 		data := SensorData{
 			ID:    "Sensor-001",
 			Value: 123.45,
 		}
 
-		// Виконуємо шаблон із передачею структури
 		err = tmpl.Execute(w, data)
 		if err != nil {
 			http.Error(w, "Template execute error", http.StatusInternalServerError)

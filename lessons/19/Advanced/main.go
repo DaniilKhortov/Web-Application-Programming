@@ -8,14 +8,12 @@ import (
 	"strconv"
 )
 
-// Структура для передачі даних у шаблон форми та помилок
 type FormData struct {
 	Username string
 	Power    string
 	Error    string
 }
 
-// Структура для підтвердження
 type ConfirmationData struct {
 	Username string
 	Power    string
@@ -42,7 +40,6 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 		username := r.PostFormValue("username")
 		powerStr := r.PostFormValue("power")
 
-		// === Валідація ===
 		var errorMsg string
 		if username == "" {
 			errorMsg = "Username field cannot be empty!"
@@ -53,7 +50,7 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if errorMsg != "" {
-			// Валідація не пройдена — повторно показуємо форму з помилкою
+
 			renderForm(w, FormData{
 				Username: username,
 				Power:    powerStr,
@@ -62,7 +59,6 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Дані коректні — показуємо сторінку підтвердження
 		renderConfirmation(w, ConfirmationData{
 			Username: username,
 			Power:    powerStr,
@@ -73,7 +69,6 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Функція для відображення форми
 func renderForm(w http.ResponseWriter, data FormData) {
 	tmpl, err := template.ParseFiles("templates/form.html")
 	if err != nil {
@@ -83,7 +78,6 @@ func renderForm(w http.ResponseWriter, data FormData) {
 	tmpl.Execute(w, data)
 }
 
-// Функція для відображення підтвердження
 func renderConfirmation(w http.ResponseWriter, data ConfirmationData) {
 	tmpl, err := template.ParseFiles("templates/confirmation.html")
 	if err != nil {

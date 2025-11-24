@@ -5,17 +5,14 @@ import (
 	"fmt"
 )
 
-// Queue — глобальний зріз клієнтів
 var Queue []models.QueueItem
 
-// AddClient додає нового клієнта
 func AddClient(name string) {
 	item := models.NewQueueItem(name)
 	Queue = append(Queue, item)
 	fmt.Printf("Successfully added client: %s (№%d)\n", item.Client, item.ID)
 }
 
-// ShowQueue показує поточну чергу
 func ShowQueue() {
 	if len(Queue) == 0 {
 		fmt.Println("Queue is empty.")
@@ -31,7 +28,6 @@ func ShowQueue() {
 	}
 }
 
-// ServeNext обслуговує наступного клієнта
 func ServeNext() {
 	if len(Queue) == 0 {
 		fmt.Println("No one to serve!")

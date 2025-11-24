@@ -37,7 +37,7 @@ func queueHandler(w http.ResponseWriter, r *http.Request) {
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		// Показуємо форму
+
 		tmpl, err := template.ParseFiles("templates/register.html")
 		if err != nil {
 			http.Error(w, "Template error: "+err.Error(), http.StatusInternalServerError)
@@ -46,7 +46,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		tmpl.Execute(w, nil)
 
 	case http.MethodPost:
-		// Обробка відправлених даних
+
 		username := r.FormValue("username")
 		password := r.FormValue("password")
 
@@ -55,20 +55,17 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Хешуємо пароль через bcrypt
 		hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
 			http.Error(w, "Помилка хешування пароля", http.StatusInternalServerError)
 			return
 		}
 
-		// Виводимо в консоль ім’я користувача та хеш
 		fmt.Println("=== Registering user ===")
 		fmt.Println("Name:", username)
 		fmt.Println("Hashed password:", string(hash))
 		fmt.Println("=====================================")
 
-		// Відповідь користувачу
 		fmt.Fprintf(w, "Registration is successful!")
 	default:
 		http.Error(w, "Method is not supported", http.StatusMethodNotAllowed)

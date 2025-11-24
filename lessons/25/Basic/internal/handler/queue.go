@@ -6,7 +6,6 @@ import (
 	"net/http"
 )
 
-// Дані для черги (імітація бази даних)
 var clients = []string{
 	"Ivan Petrenko",
 	"Maria Kondratenko",
@@ -14,7 +13,6 @@ var clients = []string{
 	"Volodymyr Kononenko",
 }
 
-// QueueHandler — обробник, який показує HTML-сторінку зі списком клієнтів
 func QueueHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Received %s request for %s", r.Method, r.URL.Path)
 

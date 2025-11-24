@@ -9,8 +9,7 @@ import (
 )
 
 func main() {
-	// --- 1. Підключення до бази даних ---
-	// Якщо ти в XAMPP і пароль порожній — прибери "1234"
+
 	connStr := "root:@tcp(127.0.0.1:3306)/queue_db"
 
 	db, err := sql.Open("mysql", connStr)
@@ -19,14 +18,12 @@ func main() {
 	}
 	defer db.Close()
 
-	// Перевірка з'єднання
 	err = db.Ping()
 	if err != nil {
 		log.Fatalf("No connection with database: %v\n", err)
 	}
 	fmt.Println("Connection established!")
 
-	// --- 2. Створення таблиці ---
 	createTable := `
 	CREATE TABLE IF NOT EXISTS queue (
 		id INT AUTO_INCREMENT PRIMARY KEY,
@@ -41,7 +38,6 @@ func main() {
 	}
 	fmt.Println("Table 'queue' successfully created!")
 
-	// --- 3. INSERT-запит ---
 	insertQuery := `INSERT INTO queue (client_name, service_type, ticket_number) VALUES (?, ?, ?)`
 
 	res, err := db.Exec(insertQuery, "Ivan Petrenko", "Communal services payment", 101)
@@ -52,7 +48,6 @@ func main() {
 	newID, _ := res.LastInsertId()
 	fmt.Printf("Added new item with ID = %d\n", newID)
 
-	// --- 4. SELECT-запит ---
 	var (
 		clientName   string
 		serviceType  string

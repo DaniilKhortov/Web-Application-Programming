@@ -7,26 +7,23 @@ import (
 	"time"
 )
 
-// Структура клієнта
 type Client struct {
 	ID        int
 	Name      string
 	TicketNum int
 }
 
-// Спільний ресурс — оброблені ID
 var (
 	ProcessedIDs []int
-	mu           sync.Mutex // захист від Data Race
+	mu           sync.Mutex
 )
 
-// --- Етап 1: DataGenerator ---
 func DataGenerator(out chan<- Client) {
 	input := []Client{
 		{1, "Michael", 1},
 		{2, "Maria", 2},
-		{3, "", 3},        // некоректне ім’я
-		{4, "Dmytro", -1}, // некоректний номер
+		{3, "", 3},
+		{4, "Dmytro", -1},
 		{5, "Daryna", 4},
 	}
 
@@ -35,10 +32,9 @@ func DataGenerator(out chan<- Client) {
 		out <- client
 		time.Sleep(200 * time.Millisecond)
 	}
-	close(out) // важливо: коректне закриття після завершення надсилання
+	close(out)
 }
 
-// --- Етап 2: ParallelFilter (паралельна обробка) ---
 func ParallelFilter(id int, in <-chan Client, wg *sync.WaitGroup) {
 	defer wg.Done()
 
@@ -56,7 +52,6 @@ func ParallelFilter(id int, in <-chan Client, wg *sync.WaitGroup) {
 	}
 }
 
-// --- Функція валідації ---
 func validate(c Client) bool {
 	if strings.TrimSpace(c.Name) == "" {
 		return false
@@ -67,17 +62,14 @@ func validate(c Client) bool {
 	return true
 }
 
-// --- Основна функція ---
 func main() {
 	fmt.Println("E-Queue")
 
 	dataChan := make(chan Client)
 	var wg sync.WaitGroup
 
-	// Запускаємо генератор
 	go DataGenerator(dataChan)
 
-	// Запускаємо 3 паралельні обробники
 	numWorkers := 3
 	wg.Add(numWorkers)
 	for i := 1; i <= numWorkers; i++ {

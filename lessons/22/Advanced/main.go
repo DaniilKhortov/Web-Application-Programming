@@ -24,7 +24,6 @@ var (
 
 const sessionName = "queue-session"
 
-// User model
 type User struct {
 	ID           int
 	Username     string
@@ -32,12 +31,11 @@ type User struct {
 	CreatedAt    time.Time
 }
 
-// helper: render template with CSRF token
 func renderTemplate(w http.ResponseWriter, r *http.Request, name string, data map[string]interface{}) {
 	if data == nil {
 		data = map[string]interface{}{}
 	}
-	// inject CSRF token into template data
+
 	data["CSRF"] = csrf.TemplateField(r)
 	t, err := template.ParseFiles(tmplDir+name, tmplDir+"base.html")
 	if err != nil {
@@ -49,7 +47,6 @@ func renderTemplate(w http.ResponseWriter, r *http.Request, name string, data ma
 	}
 }
 
-// Registration page (GET) and handler (POST)
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
@@ -63,22 +60,19 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// hash password
 		hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
 			http.Error(w, "Помилка хешування", http.StatusInternalServerError)
 			return
 		}
 
-		// insert into DB (use prepared statement to avoid injection)
 		_, err = db.Exec("INSERT INTO users (username, password_hash) VALUES ($1, $2)", username, string(hash))
 		if err != nil {
-			// unique username violation -> user-friendly
+
 			http.Error(w, "Не вдалося створити користувача: "+err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		// log to server console (username + hash)
 		fmt.Println("=== New user registered ===")
 		fmt.Println("Username:", username)
 		fmt.Println("Password hash:", string(hash))
@@ -90,7 +84,6 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Login handler
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
@@ -103,7 +96,6 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// fetch user hash from DB
 		var id int
 		var passHash string
 		err := db.QueryRow("SELECT id, password_hash FROM users WHERE username = $1", username).Scan(&id, &passHash)
@@ -115,14 +107,12 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// compare hash
 		err = bcrypt.CompareHashAndPassword([]byte(passHash), []byte(password))
 		if err != nil {
 			http.Error(w, "Невірні облікові дані", http.StatusUnauthorized)
 			return
 		}
 
-		// create session
 		session, _ := store.Get(r, sessionName)
 		session.Values["authenticated"] = true
 		session.Values["username"] = username
@@ -134,7 +124,6 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Home page (requires auth)
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, sessionName)
 	auth, _ := session.Values["authenticated"].(bool)
@@ -149,7 +138,6 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, r, "home.html", data)
 }
 
-// Logout
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, sessionName)
 	session.Values["authenticated"] = false
@@ -159,7 +147,7 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	// read config from env
+
 	dsn := os.Getenv("DB_DSN")
 	if dsn == "" {
 		log.Fatal("DB_DSN не встановлено")
@@ -188,33 +176,28 @@ func main() {
 		port = "4430"
 	}
 
-	// open DB
 	var err error
-	db, err = sql.Open("postgres", dsn) // якщо використовуєш MySQL — змінити драйвер та DSN
+	db, err = sql.Open("postgres", dsn)
 	if err != nil {
 		log.Fatalf("Помилка підключення до БД: %v", err)
 	}
 	defer db.Close()
 
-	// simple ping
 	if err := db.Ping(); err != nil {
 		log.Fatalf("DB ping error: %v", err)
 	}
 
-	// cookie store
 	store = sessions.NewCookieStore([]byte(sessionKey))
 	store.Options = &sessions.Options{
 		Path:     "/",
 		MaxAge:   86400 * 1, // 1 day
 		HttpOnly: true,
-		Secure:   true, // в локальному тесті https повинен бути увімкнений (ми використовуємо ListenAndServeTLS)
+		Secure:   true,
 		SameSite: http.SameSiteStrictMode,
 	}
 
-	// CSRF protection middleware
 	csrfProtect = csrf.Protect([]byte(csrfKey), csrf.Secure(true))
 
-	// routes
 	mux := http.NewServeMux()
 	mux.HandleFunc("/register", registerHandler)
 	mux.HandleFunc("/login", loginHandler)
@@ -224,7 +207,6 @@ func main() {
 	// static (if потрібні стилі) — приклад
 	// mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	// In production add timeouts; for demo we keep simple
 	handler := csrfProtect(mux)
 
 	addr := fmt.Sprintf(":%s", port)

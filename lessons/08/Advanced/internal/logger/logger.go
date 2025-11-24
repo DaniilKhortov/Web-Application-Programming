@@ -6,7 +6,6 @@ import (
 
 var Log *logrus.Logger
 
-// init викликається автоматично при імпорті пакету
 func init() {
 	Log = logrus.New()
 	Log.SetLevel(logrus.InfoLevel)
@@ -14,7 +13,6 @@ func init() {
 	Log.Info("Logger initialized!")
 }
 
-// Init дозволяє повторно ініціалізувати логер, якщо потрібно
 func Init() {
 	Log.Info("Logger online.")
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	// URL публічного API — у реальному застосунку це був би ендпоїнт черги
+
 	url := "https://jsonplaceholder.typicode.com/posts/1"
 
 	// Виконання GET-запиту

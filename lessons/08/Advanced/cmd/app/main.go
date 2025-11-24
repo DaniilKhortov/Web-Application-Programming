@@ -12,11 +12,9 @@ import (
 func main() {
 	color.Cyan("Running queue...")
 
-	// Ініціалізація логера та конфігурації
 	logger.Init()
 	cfg := config.Load()
 
-	// Використання інтерфейсу
 	var q interfaces.QueueService = queue.New(cfg.MaxSize)
 	q.Enqueue("Task A")
 	q.Enqueue("Task B")

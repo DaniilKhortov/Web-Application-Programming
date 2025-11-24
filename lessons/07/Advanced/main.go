@@ -6,8 +6,6 @@ import (
 	"sort"
 )
 
-// ======================== Address ========================
-
 type Address struct {
 	City    string `json:"city"`
 	Street  string `json:"street"`
@@ -17,8 +15,6 @@ type Address struct {
 func NewAddress(city, street, zip string) Address {
 	return Address{City: city, Street: street, ZipCode: zip}
 }
-
-// ======================== QueueData ========================
 
 type QueueData struct {
 	Position int `json:"position"`
@@ -36,15 +32,13 @@ func (q QueueData) EstimatedWait() int {
 func (q *QueueData) SetPosition(p int) { q.Position = p }
 func (q *QueueData) SetAvgTime(a int)  { q.AvgTime = a }
 
-// ======================== Client ========================
-
 type Client struct {
-	ID        int     `json:"id"`
-	Name      string  `json:"name"`
-	Email     string  `json:"email"`
-	Phone     string  `json:"phone"`
-	Address   Address `json:"address"`
-	QueueData         // embedding
+	ID      int     `json:"id"`
+	Name    string  `json:"name"`
+	Email   string  `json:"email"`
+	Phone   string  `json:"phone"`
+	Address Address `json:"address"`
+	QueueData
 }
 
 func NewClient(id int, name, email, phone string, addr Address, pos, avg int) Client {
@@ -71,8 +65,6 @@ func (c *Client) UpdatePosition(newPos int) {
 	c.Position = newPos
 }
 
-// ======================== QueueManager ========================
-
 type QueueManager struct {
 	clients []Client
 }
@@ -93,14 +85,12 @@ func (qm *QueueManager) TotalEstimatedTime() int {
 	return total
 }
 
-// 🔁 Зміна порядку клієнтів у черзі
 func (qm *QueueManager) Reorder() {
 	sort.SliceStable(qm.clients, func(i, j int) bool {
 		return qm.clients[i].Position < qm.clients[j].Position
 	})
 }
 
-// JSON серіалізація
 func (qm QueueManager) ToJSON() string {
 	data, _ := json.MarshalIndent(qm.clients, "", "  ")
 	return string(data)
@@ -128,7 +118,6 @@ func main() {
 	fmt.Println("Queue:")
 	manager.PrintAll()
 
-	// Сортування за позицією
 	manager.Reorder()
 
 	fmt.Println("\nAfter updating positions:")

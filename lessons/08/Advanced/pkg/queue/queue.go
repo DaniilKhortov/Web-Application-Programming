@@ -5,19 +5,16 @@ import (
 	"fmt"
 )
 
-// Queue реалізує просту чергу рядків.
 type Queue struct {
 	items []string
 	limit int
 }
 
-// New створює нову чергу з вказаним розміром.
 func New(limit int) *Queue {
 	logger.Log.Info("Initialized new queue!")
 	return &Queue{limit: limit}
 }
 
-// Enqueue додає елемент у чергу.
 func (q *Queue) Enqueue(item string) {
 	if len(q.items) >= q.limit {
 		logger.Log.Warn("Queue is full!")
@@ -27,7 +24,6 @@ func (q *Queue) Enqueue(item string) {
 	logger.Log.Infof("Added: %s", item)
 }
 
-// Dequeue витягує елемент із черги.
 func (q *Queue) Dequeue() (string, bool) {
 	if len(q.items) == 0 {
 		return "", false
@@ -38,7 +34,6 @@ func (q *Queue) Dequeue() (string, bool) {
 	return item, true
 }
 
-// Size повертає поточну довжину черги.
 func (q *Queue) Size() int {
 	return len(q.items)
 }

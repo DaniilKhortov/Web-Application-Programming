@@ -11,7 +11,7 @@ import (
 // Post — структура, яка моделює запит і відповідь API
 type Post struct {
 	UserID int    `json:"userId"`
-	ID     int    `json:"id,omitempty"` // id не передаємо в запиті, але очікуємо у відповіді
+	ID     int    `json:"id,omitempty"`
 	Title  string `json:"title"`
 	Body   string `json:"body"`
 }

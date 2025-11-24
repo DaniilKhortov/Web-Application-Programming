@@ -9,14 +9,12 @@ import (
 	"sync"
 )
 
-// Metric описує структуру метрики
 type Metric struct {
-	ID    int     `json:"id"`    // Унікальний ідентифікатор
-	Name  string  `json:"name"`  // Назва метрики
-	Value float64 `json:"value"` // Значення метрики
+	ID    int     `json:"id"`
+	Name  string  `json:"name"`
+	Value float64 `json:"value"`
 }
 
-// Глобальний зріз для імітації сховища даних та м'ютекс для безпечного доступу
 var (
 	metrics []Metric
 	nextID  = 1
@@ -26,13 +24,10 @@ var (
 func main() {
 	mux := http.NewServeMux()
 
-	// Маршрут для роботи з усіма метриками
 	mux.HandleFunc("/metrics", metricsHandler)
 
-	// Маршрут для роботи з конкретною метрикою по ID
-	mux.HandleFunc("/metrics/", metricHandler) // обов'язково закінчується слешем
+	mux.HandleFunc("/metrics/", metricHandler)
 
-	// Початкові дані
 	metrics = append(metrics, Metric{ID: nextID, Name: "waiting_clients", Value: 5})
 	nextID++
 	metrics = append(metrics, Metric{ID: nextID, Name: "served_clients", Value: 12})
@@ -44,7 +39,6 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }
 
-// Обробник для GET (усіх) та POST (створення) метрик
 func metricsHandler(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
@@ -62,19 +56,17 @@ func metricsHandler(w http.ResponseWriter, r *http.Request) {
 		newMetric.ID = nextID
 		nextID++
 		metrics = append(metrics, newMetric)
-		w.WriteHeader(http.StatusCreated) // 201 Created
+		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(newMetric)
 	default:
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 	}
 }
 
-// Обробник для GET, PUT, DELETE конкретної метрики за ID
 func metricHandler(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	// Витягуємо ID з URL: /metrics/{id}
 	parts := strings.Split(r.URL.Path, "/")
 	if len(parts) != 3 {
 		http.NotFound(w, r)
@@ -87,7 +79,6 @@ func metricHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Шукаємо метрику
 	index := -1
 	for i, m := range metrics {
 		if m.ID == id {
@@ -116,7 +107,7 @@ func metricHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(updated)
 	case http.MethodDelete:
 		metrics = append(metrics[:index], metrics[index+1:]...)
-		w.WriteHeader(http.StatusNoContent) // 204 No Content
+		w.WriteHeader(http.StatusNoContent)
 	default:
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 	}

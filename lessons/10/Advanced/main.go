@@ -6,7 +6,6 @@ import (
 	"time"
 )
 
-// Структура для результату обробки клієнта
 type Result struct {
 	id     int
 	status string
@@ -16,7 +15,6 @@ func serveClient(id int, results chan<- Result) {
 	start := time.Now()
 	fmt.Printf("Goroutine %d starting (client in queue)\n", id)
 
-	// Імітація роботи (0.1–0.3 с)
 	time.Sleep(time.Duration(100+rand.Intn(200)) * time.Millisecond)
 
 	results <- Result{
@@ -29,10 +27,9 @@ func serveClient(id int, results chan<- Result) {
 func parallelProcessing(numClients int) time.Duration {
 	start := time.Now()
 
-	results := make(chan Result, numClients) // буферизований канал результатів
+	results := make(chan Result, numClients)
 	defer close(results)
 
-	// Запускаємо клієнтів паралельно
 	for i := 1; i <= numClients; i++ {
 		go serveClient(i, results)
 	}
@@ -69,14 +66,12 @@ func main() {
 	numClients := 8
 
 	fmt.Println("Paralel computing")
-	// Паралельне виконання
+
 	parallelTime := parallelProcessing(numClients)
 
-	// Послідовне виконання
 	fmt.Println("Gradual computing")
 	sequentialTime := sequentialProcessing(numClients)
 
-	// Порівняльний аналіз
 	fmt.Println("\nResults")
 	fmt.Printf("Paralel computing: %v\n", parallelTime)
 	fmt.Printf("Gradual computing: %v\n", sequentialTime)
