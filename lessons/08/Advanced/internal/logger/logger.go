@@ -6,6 +6,7 @@ import (
 
 var Log *logrus.Logger
 
+// Функція init ініціалізовує логер
 func init() {
 	Log = logrus.New()
 	Log.SetLevel(logrus.InfoLevel)
@@ -13,6 +14,8 @@ func init() {
 	Log.Info("Logger initialized!")
 }
 
+// Функція Init запускається лише один раз для модулю
+// Повідомляє, що модуль є активним
 func Init() {
 	Log.Info("Logger online.")
 }

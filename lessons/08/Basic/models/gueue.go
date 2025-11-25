@@ -1,5 +1,6 @@
 package models
 
+//Структура елементу черги
 type QueueItem struct {
 	ID       int
 	Client   string
@@ -8,6 +9,8 @@ type QueueItem struct {
 
 var queueCounter int
 
+//Функція NewQueueItem створює новий елемнт черги.
+//Поле ID визначається автоматично
 func NewQueueItem(client string) QueueItem {
 	queueCounter++
 	return QueueItem{

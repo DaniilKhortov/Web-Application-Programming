@@ -8,16 +8,20 @@ import (
 	"github.com/fatih/color"
 )
 
+// Утворення черги
 var queue []models.QueueItem
 
+// Лічильник клієнтів
 var counter int
 
+// Фуекція init ініціалізовує параметри модулю
 func init() {
 	color.Blue("Initializing gueue")
 	queue = []models.QueueItem{}
 	counter = 0
 }
 
+// Функція AddClient додає клієнта до черги
 func AddClient(name string) {
 	counter++
 	item := models.QueueItem{
@@ -31,6 +35,8 @@ func AddClient(name string) {
 	utils.PrintDivider()
 }
 
+// Функція ShowQueue ітеративно показує значення кожного елементу черги
+// Або вказує, що черга порожня
 func ShowQueue() {
 	if len(queue) == 0 {
 		color.Yellow("Queue is empty.")
@@ -47,6 +53,8 @@ func ShowQueue() {
 	utils.PrintDivider()
 }
 
+// Функція ServeNext обслуговує першого клієнта в черзі, після чого скорочує чергу
+// Або вказує, що черга порожня
 func ServeNext() {
 	if len(queue) == 0 {
 		color.Red("No one to serve")

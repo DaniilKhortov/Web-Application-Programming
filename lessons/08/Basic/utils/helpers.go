@@ -7,12 +7,17 @@ import (
 
 var Queue []models.QueueItem
 
+// Функція AddClient додає клієнта до черги
 func AddClient(name string) {
+	//Реєстрація елементу черги
 	item := models.NewQueueItem(name)
+	//Додавання елементу черги
 	Queue = append(Queue, item)
 	fmt.Printf("Successfully added client: %s (№%d)\n", item.Client, item.ID)
 }
 
+// Функція ShowQueue ітеративно показує значення кожного елементу черги
+// Або вказує, що черга порожня
 func ShowQueue() {
 	if len(Queue) == 0 {
 		fmt.Println("Queue is empty.")
@@ -28,6 +33,8 @@ func ShowQueue() {
 	}
 }
 
+// Функція ServeNext обслуговує першого клієнта в черзі, після чого скорочує чергу
+// Або вказує, що черга порожня
 func ServeNext() {
 	if len(Queue) == 0 {
 		fmt.Println("No one to serve!")
