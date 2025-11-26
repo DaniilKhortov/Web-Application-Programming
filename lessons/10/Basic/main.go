@@ -1,32 +1,30 @@
 package main
 
-import (
-	"fmt"
-	"sync"
-	"time"
-)
+//Представлення функції у С
+/*
+#include <stdio.h>
 
-func serveClient(id int, wg *sync.WaitGroup) {
-	defer wg.Done()
-
-	fmt.Printf("Goroutine %d starting (client in queue)\n", id)
-
-	// Імітація обробки запиту клієнта
-	time.Sleep(100 * time.Millisecond)
-
-	fmt.Printf("Goroutine %d finished (client served)\n", id)
+// Вбудована C-функція, яка приймає два int і повертає їхню суму
+int add(int a, int b) {
+    return a + b;
 }
+*/
+import "C"
+
+import "fmt"
 
 func main() {
-	var wg sync.WaitGroup
+	fmt.Println("E-Queue")
+	fmt.Println("Calling C-function via cgo")
 
-	wg.Add(3)
+	//Створення клієнтів у черзі та в обслуговувані
+	// Припустимо, що у черзі 3 клієнти, і обслуговується ще 2
+	var queueCount int = 3
+	var servingNow int = 2
 
-	for i := 1; i <= 3; i++ {
-		go serveClient(i, &wg)
-	}
+	// Викликаємо C-функцію для підрахунку загальної кількості клієнтів
+	total := C.add(C.int(queueCount), C.int(servingNow))
 
-	wg.Wait()
-
-	fmt.Println("Everyone is served!")
+	// Виводимо результат (перетворюємо тип c.int у Go int)
+	fmt.Printf("General amount of clients in queue: %d\n", int(total))
 }

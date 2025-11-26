@@ -4,21 +4,25 @@ import (
 	"fmt"
 )
 
+// Інтерфейс функцій роботи з чергою
 type Queueable interface {
 	AddClient(name string)
 	NextClient() string
 	Count() int
 }
 
+// Структура звичайної черги
 type SimpleQueue struct {
 	clients []string
 }
 
+// Функція додавання клієнтів до черги
 func (q *SimpleQueue) AddClient(name string) {
 	q.clients = append(q.clients, name)
 	fmt.Printf("Added clients %s into SimpleQueue\n", name)
 }
 
+// Функція обслуговування клієнтів до черги
 func (q *SimpleQueue) NextClient() string {
 	if len(q.clients) == 0 {
 		return "Queue is empty"
@@ -28,15 +32,18 @@ func (q *SimpleQueue) NextClient() string {
 	return next
 }
 
+// Функція обчислення розміру пріоритетної черги
 func (q *SimpleQueue) Count() int {
 	return len(q.clients)
 }
 
+// Структура пріоритетної черги
 type PriorityQueue struct {
 	priorityClients []string
 	normalClients   []string
 }
 
+// Функція додавання клієнта до пріоритетної черги
 func (pq *PriorityQueue) AddClient(name string) {
 	if len(name) > 0 && name[0] == '!' {
 		pq.priorityClients = append(pq.priorityClients, name[1:])
@@ -47,6 +54,7 @@ func (pq *PriorityQueue) AddClient(name string) {
 	}
 }
 
+// Функція обслуговування клієнтів до пріоритетної черги
 func (pq *PriorityQueue) NextClient() string {
 	if len(pq.priorityClients) > 0 {
 		next := pq.priorityClients[0]
@@ -61,15 +69,18 @@ func (pq *PriorityQueue) NextClient() string {
 	return "Queue is empty"
 }
 
+// Функція обчислення розміру пріоритетної черги
 func (pq *PriorityQueue) Count() int {
 	return len(pq.priorityClients) + len(pq.normalClients)
 }
 
+// Функція виводу розміру пріоритетної черги
 func (pq PriorityQueue) String() string {
 	return fmt.Sprintf("PriorityQueue: %d high priority, %d common clients",
 		len(pq.priorityClients), len(pq.normalClients))
 }
 
+// Функція обслуговування клієнтів черги
 func ServeNext(q Queueable) {
 	fmt.Println("Servicing:", q.NextClient())
 
@@ -84,9 +95,11 @@ func ServeNext(q Queueable) {
 }
 
 func main() {
+	//Утворення черг
 	sq := &SimpleQueue{}
 	pq := &PriorityQueue{}
 
+	//Додавання клієнтів до черг
 	sq.AddClient("Oleh")
 	sq.AddClient("Maksym")
 	pq.AddClient("!Andriy")
@@ -94,6 +107,7 @@ func main() {
 
 	fmt.Println()
 
+	//Обслуговування черг
 	ServeNext(sq)
 	ServeNext(pq)
 
