@@ -3,7 +3,7 @@
 ## Корисні посилання
 - [План робіт](docs/plan.md)
 - [Список варіантів](docs/variants.md)
-- [Актуальна версія збірника](https://raw.githubusercontent.com/DaniilKhortov/Web-Application-Programming/main/guidebook/Курс_з_GO.docx)
+- [Актуальна версія НМК](https://raw.githubusercontent.com/DaniilKhortov/Web-Application-Programming/main/guidebook/Курс_з_GO.docx)
 
 ## Документація
 - [Презентація роботи](https://raw.githubusercontent.com/DaniilKhortov/Web-Application-Programming/main/docs/GO/ТВ-21_Хортов_Програмування_Вебзастосунків_GO_Проєкт_дипломної_роботи.pptx)
