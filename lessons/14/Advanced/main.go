@@ -8,17 +8,21 @@ import (
 	"time"
 )
 
+// Структура клієнта
 type Client struct {
 	ID        int
 	Name      string
 	TicketNum int
 }
 
+// Структура результату
 type Result struct {
 	Client  Client
 	Message string
 }
 
+// DataGenerator - записує клієнтів до каналу
+// Зупиняється за командою
 func DataGenerator(out chan<- Client, errCh chan<- error, done chan struct{}) {
 	defer close(out)
 
@@ -43,6 +47,8 @@ func DataGenerator(out chan<- Client, errCh chan<- error, done chan struct{}) {
 	}
 }
 
+// Validator - перевіряє коректність даних з каналу
+// Зупиняється за командою
 func Validator(in <-chan Client, out chan<- Client, errCh chan<- error, done chan struct{}) {
 	defer close(out)
 
@@ -64,6 +70,8 @@ func Validator(in <-chan Client, out chan<- Client, errCh chan<- error, done cha
 	}
 }
 
+// Aggregator обслуговує клієнтів з черги
+// Зупиняється за командою
 func Aggregator(in <-chan Client, results chan<- Result, errCh chan<- error, done chan struct{}) {
 	defer close(results)
 
@@ -81,6 +89,8 @@ func Aggregator(in <-chan Client, results chan<- Result, errCh chan<- error, don
 	}
 }
 
+// validate - перевіряє коректність даних
+// Використовується у Validator як оператор перевірки
 func validate(c Client) bool {
 	if strings.TrimSpace(c.Name) == "" {
 		return false
@@ -94,6 +104,7 @@ func validate(c Client) bool {
 func main() {
 	fmt.Println("E-Queue")
 
+	//Ініціалізація каналів даних, перевірки, результату, помилки та команди завершення
 	dataCh := make(chan Client)
 	validCh := make(chan Client)
 	resultsCh := make(chan Result)
@@ -103,27 +114,32 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(3)
 
+	//Запуск горутини запису даних
 	go func() {
 		defer wg.Done()
 		DataGenerator(dataCh, errCh, done)
 	}()
 
+	//Запуск горутини перевірки даних
 	go func() {
 		defer wg.Done()
 		Validator(dataCh, validCh, errCh, done)
 	}()
 
+	//Запуск горутини обслуговування клієнтів
 	go func() {
 		defer wg.Done()
 		Aggregator(validCh, resultsCh, errCh, done)
 	}()
 
+	//Запуск горутини результатів обслуговування черги
 	go func() {
 		for res := range resultsCh {
 			fmt.Printf("[Result] %s\n", res.Message)
 		}
 	}()
 
+	//Вивід результатів стану виконання
 	select {
 	case err := <-errCh:
 		fmt.Println("\n[Main] Recieved error:", err)

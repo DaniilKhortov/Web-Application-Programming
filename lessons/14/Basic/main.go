@@ -6,11 +6,13 @@ import (
 	"time"
 )
 
+// Структура клієнта
 type Client struct {
 	Name      string
 	TicketNum int
 }
 
+// DataReader - записує клієнтів до каналу
 func DataReader(out chan<- Client) {
 
 	input := []Client{
@@ -29,6 +31,7 @@ func DataReader(out chan<- Client) {
 	close(out)
 }
 
+// DataProcessor - зчитує клієнтів з каналу та виводить його дані
 func DataProcessor(in <-chan Client) {
 	for client := range in {
 		if validate(client) {
@@ -41,6 +44,7 @@ func DataProcessor(in <-chan Client) {
 	}
 }
 
+// validate - перевіряє коректність даних
 func validate(c Client) bool {
 	if strings.TrimSpace(c.Name) == "" {
 		return false
@@ -54,9 +58,13 @@ func validate(c Client) bool {
 func main() {
 	fmt.Println("E-Queue")
 
+	//Утворення каналу
 	dataChan := make(chan Client)
 
+	//Запуск горутини - зчитувача
 	go DataReader(dataChan)
+
+	//DataProcessor обробляє дані, що були передані через канал
 	DataProcessor(dataChan)
 
 	fmt.Println("Work is done!")

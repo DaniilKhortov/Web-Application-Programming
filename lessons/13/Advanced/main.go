@@ -1,4 +1,3 @@
-// file: main.go
 package main
 
 import (
@@ -6,31 +5,6 @@ import (
 	"math/rand"
 	"time"
 )
-
-// processingDone — канал повідомляє, що черговий клієнт оброблений
-// shutdown — глобальний сигнал зупинки всієї системи (вимикає монітор)
-func main() {
-
-	processingDone := make(chan int) // небуферизований канал: події завершення обробки
-	shutdown := make(chan struct{})  // небуферизований канал: глобальне завершення
-
-	// Імітація джерела подій (обробка клієнтів)
-	go clientProcessor(processingDone, shutdown)
-
-	// Імітація монітору стану системи
-	go statusMonitor(processingDone, shutdown)
-
-	// Дозволяємо системі попрацювати кілька секунд
-	time.Sleep(3 * time.Second)
-
-	// Відправляємо глобальний сигнал завершення
-	fmt.Println("\n[MAIN] Sending command to end...")
-	close(shutdown)
-
-	// Додатковий час для коректного завершення горутин
-	time.Sleep(1 * time.Second)
-	fmt.Println("[MAIN] Work is done!")
-}
 
 // clientProcessor — генерує події (обробку клієнтів)
 func clientProcessor(done chan<- int, shutdown <-chan struct{}) {
@@ -64,4 +38,30 @@ func statusMonitor(done <-chan int, shutdown <-chan struct{}) {
 			return
 		}
 	}
+}
+
+func main() {
+
+	// processingDone — канал повідомляє, що черговий клієнт оброблений
+	processingDone := make(chan int)
+
+	// shutdown — глобальний сигнал зупинки всієї системи (вимикає монітор)
+	shutdown := make(chan struct{})
+
+	// Імітація джерела подій (обробка клієнтів)
+	go clientProcessor(processingDone, shutdown)
+
+	// Імітація монітору стану системи
+	go statusMonitor(processingDone, shutdown)
+
+	// Дозволяємо системі попрацювати кілька секунд
+	time.Sleep(3 * time.Second)
+
+	// Відправляємо глобальний сигнал завершення
+	fmt.Println("\n[MAIN] Sending command to end...")
+	close(shutdown)
+
+	// Додатковий час для коректного завершення горутин
+	time.Sleep(1 * time.Second)
+	fmt.Println("[MAIN] Work is done!")
 }

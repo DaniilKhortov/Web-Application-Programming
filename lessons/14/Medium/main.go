@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// Структура клієнта
 type Client struct {
 	ID        int
 	Name      string
@@ -18,6 +19,7 @@ var (
 	mu           sync.Mutex
 )
 
+// DataGenerator - записує клієнтів до каналу
 func DataGenerator(out chan<- Client) {
 	input := []Client{
 		{1, "Michael", 1},
@@ -35,6 +37,8 @@ func DataGenerator(out chan<- Client) {
 	close(out)
 }
 
+// ParallelFilter - зчитує клієнтів з каналу та виводить його дані
+// Використовує безпечну обробку данних
 func ParallelFilter(id int, in <-chan Client, wg *sync.WaitGroup) {
 	defer wg.Done()
 
@@ -52,6 +56,7 @@ func ParallelFilter(id int, in <-chan Client, wg *sync.WaitGroup) {
 	}
 }
 
+// validate - перевіряє коректність даних
 func validate(c Client) bool {
 	if strings.TrimSpace(c.Name) == "" {
 		return false
@@ -68,8 +73,10 @@ func main() {
 	dataChan := make(chan Client)
 	var wg sync.WaitGroup
 
+	//Запуск горутини
 	go DataGenerator(dataChan)
 
+	//Обробка даних з каналу в кілька потоків
 	numWorkers := 3
 	wg.Add(numWorkers)
 	for i := 1; i <= numWorkers; i++ {
@@ -78,6 +85,7 @@ func main() {
 
 	wg.Wait()
 
+	//Вивід результатів
 	fmt.Println("\nAll client served!")
 	mu.Lock()
 	fmt.Println("ID of clients after check:", ProcessedIDs)

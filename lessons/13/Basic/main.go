@@ -6,8 +6,10 @@ import (
 	"time"
 )
 
+// Задання кількості потоків
 const workers = 1000
 
+// simulateWithoutMutex — виконує обробку без блокування Mutex
 func simulateWithoutMutex() int {
 	var counter int
 	var wg sync.WaitGroup
@@ -27,6 +29,7 @@ func simulateWithoutMutex() int {
 	return counter
 }
 
+// simulateWithMutex — виконує обробку з блокуванням Mutex
 func simulateWithMutex() int {
 	var counter int
 	var wg sync.WaitGroup
@@ -38,6 +41,7 @@ func simulateWithMutex() int {
 
 			time.Sleep(time.Microsecond * time.Duration(id%5))
 
+			//Блокування інших потоків від модифікації змінної counter
 			mu.Lock()
 			defer mu.Unlock()
 			counter = counter + 1
@@ -53,6 +57,7 @@ func main() {
 
 	fmt.Printf("Running %d goroutines to serve clients simulteniosly.\n\n", workers)
 
+	//Виконання роботи без бепечної обробки даних
 	fmt.Println("Data Race without Mutex:")
 	noMutexCount := simulateWithoutMutex()
 	fmt.Printf("Result: %d (expected %d)\n", noMutexCount, workers)
@@ -63,6 +68,7 @@ func main() {
 	}
 	fmt.Println()
 
+	//Виконання роботи з бепечною обробкою даних
 	fmt.Println("Data Race with Mutex:")
 	withMutexCount := simulateWithMutex()
 	fmt.Printf("Result: %d (expected %d)\n", withMutexCount, workers)
