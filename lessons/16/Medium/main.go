@@ -12,21 +12,26 @@ import (
 )
 
 func main() {
-
+	//Ініціалізація застосунку fyne
 	myApp := app.New()
 
+	//Створення вікна графічного інтерфейсу
 	myWindow := myApp.NewWindow("Застосунок 2")
 
+	//Створення першого поля вводу
 	entry1 := widget.NewEntry()
 	entry1.SetPlaceHolder("Введіть перше число")
 
+	//Створення другого поля вводу
 	entry2 := widget.NewEntry()
 	entry2.SetPlaceHolder("Введіть друге число")
 
+	//Створення напису з результатом
 	resultLabel := widget.NewLabel("Місце для результату")
 
+	//Створення кнопки
 	calcButton := widget.NewButton("Обчислити суму", func() {
-
+		//Тіло функції-тригера
 		num1Text := entry1.Text
 		num2Text := entry2.Text
 
@@ -40,9 +45,11 @@ func main() {
 
 		sum := num1 + num2
 
+		//Задання значення напису
 		resultLabel.SetText(fmt.Sprintf("[%s] Сума: %.2f", time.Now().Format("15:04:05"), sum))
 	})
 
+	//Розміщення вмісту
 	content := container.NewVBox(
 		widget.NewLabel("Введіть два числа для обчислення суми:"),
 		entry1,
@@ -50,10 +57,11 @@ func main() {
 		calcButton,
 		resultLabel,
 	)
-
 	myWindow.SetContent(content)
 
+	//Задання розміру вікна
 	myWindow.Resize(fyne.NewSize(400, 300))
 
+	//Запуск графічного інтерфейсу
 	myWindow.ShowAndRun()
 }

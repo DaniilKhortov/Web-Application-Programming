@@ -11,26 +11,35 @@ import (
 )
 
 func main() {
-
+	//Ініціалізація застосунку fyne
 	myApp := app.New()
 
+	//Створення вікна графічного інтерфейсу
 	myWindow := myApp.NewWindow("Застосунок 3")
 
+	//Створення напису з часом
 	timeLabel := widget.NewLabel("Час оновлюється...")
 
+	//Створення опису поряд з годинником
 	titleLabel := widget.NewLabel("Поточний час системи:")
 
+	//Розміщення вмісту
 	content := container.NewVBox(
 		titleLabel,
 		timeLabel,
 	)
-
 	myWindow.SetContent(content)
+
+	//Задання розміру вікна
 	myWindow.Resize(fyne.NewSize(300, 200))
+
+	//Запуск графічного інтерфейсу
 	myWindow.Show()
 
+	//Створення лічильника часу
 	ticker := time.NewTicker(1 * time.Second)
 
+	//Створення горутини для оновлення часу
 	go func() {
 		for t := range ticker.C {
 
@@ -40,5 +49,6 @@ func main() {
 		}
 	}()
 
+	//Запуск застосунку
 	myApp.Run()
 }
