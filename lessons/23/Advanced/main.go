@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Post — структура, яка моделює запит і відповідь API
+// Post — структура, яка відповідає JSON-відповіді з API
 type Post struct {
 	UserID int    `json:"userId"`
 	ID     int    `json:"id,omitempty"`

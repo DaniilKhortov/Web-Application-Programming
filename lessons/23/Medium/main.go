@@ -7,7 +7,6 @@ import (
 )
 
 // Post — структура, яка відповідає JSON-відповіді з API
-// https://jsonplaceholder.typicode.com/posts/1
 type Post struct {
 	UserID int    `json:"userId"`
 	ID     int    `json:"id"`

@@ -15,6 +15,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Змінна для керування маршрутизацією
 var (
 	tmplDir     = "templates/"
 	store       *sessions.CookieStore
@@ -24,6 +25,7 @@ var (
 
 const sessionName = "queue-session"
 
+// Структура для клієнтів черги
 type User struct {
 	ID           int
 	Username     string
@@ -31,6 +33,7 @@ type User struct {
 	CreatedAt    time.Time
 }
 
+// Функція для відображення сторінок
 func renderTemplate(w http.ResponseWriter, r *http.Request, name string, data map[string]interface{}) {
 	if data == nil {
 		data = map[string]interface{}{}
@@ -47,8 +50,10 @@ func renderTemplate(w http.ResponseWriter, r *http.Request, name string, data ma
 	}
 }
 
+// Обробник маршруту /register для сторінки реєстрації
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
+	//Обробка запитів
 	case http.MethodGet:
 		renderTemplate(w, r, "register.html", nil)
 	case http.MethodPost:
@@ -56,36 +61,37 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		password := r.FormValue("password")
 
 		if username == "" || password == "" {
-			http.Error(w, "Заповніть всі поля", http.StatusBadRequest)
+			http.Error(w, "Fill all fields", http.StatusBadRequest)
 			return
 		}
 
 		hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
-			http.Error(w, "Помилка хешування", http.StatusInternalServerError)
+			http.Error(w, "Hash error", http.StatusInternalServerError)
 			return
 		}
 
-		_, err = db.Exec("INSERT INTO users (username, password_hash) VALUES ($1, $2)", username, string(hash))
+		//Запис у MySQL
+		_, err = db.Exec("INSERT INTO users (username, password_hash) VALUES (?, ?)", username, string(hash))
 		if err != nil {
-
-			http.Error(w, "Не вдалося створити користувача: "+err.Error(), http.StatusBadRequest)
+			http.Error(w, "Failed to register user: "+err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		fmt.Println("=== New user registered ===")
+		fmt.Println("Registering user:")
 		fmt.Println("Username:", username)
 		fmt.Println("Password hash:", string(hash))
-		fmt.Println("===========================")
 
 		renderTemplate(w, r, "register_success.html", nil)
 	default:
-		http.Error(w, "Метод не підтримується", http.StatusMethodNotAllowed)
+		http.Error(w, "Method is not supported", http.StatusMethodNotAllowed)
 	}
 }
 
+// Обробник маршруту /lodin для сторінки входу
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
+	//Обробка запитів
 	case http.MethodGet:
 		renderTemplate(w, r, "login.html", nil)
 	case http.MethodPost:
@@ -98,18 +104,19 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 		var id int
 		var passHash string
-		err := db.QueryRow("SELECT id, password_hash FROM users WHERE username = $1", username).Scan(&id, &passHash)
+		//Запис у MySQL
+		err := db.QueryRow("SELECT id, password_hash FROM users WHERE username = ?", username).Scan(&id, &passHash)
 		if err == sql.ErrNoRows {
-			http.Error(w, "Невірні облікові дані", http.StatusUnauthorized)
+			http.Error(w, "Account data is corrupted", http.StatusUnauthorized)
 			return
 		} else if err != nil {
-			http.Error(w, "Помилка сервера", http.StatusInternalServerError)
+			http.Error(w, "Server error", http.StatusInternalServerError)
 			return
 		}
 
 		err = bcrypt.CompareHashAndPassword([]byte(passHash), []byte(password))
 		if err != nil {
-			http.Error(w, "Невірні облікові дані", http.StatusUnauthorized)
+			http.Error(w, "Incorrect account data", http.StatusUnauthorized)
 			return
 		}
 
@@ -120,10 +127,11 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "/home", http.StatusSeeOther)
 	default:
-		http.Error(w, "Метод не підтримується", http.StatusMethodNotAllowed)
+		http.Error(w, "Method is not supported", http.StatusMethodNotAllowed)
 	}
 }
 
+// Обробник маршруту /register для головної сторінки (сторінки після успішної реєстрації)
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, sessionName)
 	auth, _ := session.Values["authenticated"].(bool)
@@ -138,6 +146,8 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, r, "home.html", data)
 }
 
+// Обробник маршруту /logout
+// На відмінну від інших маршрутів є перехідним процесом
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, sessionName)
 	session.Values["authenticated"] = false
@@ -147,20 +157,28 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-
+	//Перевірка встановлення DB_DSN
+	//Для встановленн необхідно виконати в командному рядку:
+	//set DB_DSN=postgres://myuser:mypassword@localhost:5432/mydatabase?sslmode=disable
 	dsn := os.Getenv("DB_DSN")
 	if dsn == "" {
-		log.Fatal("DB_DSN не встановлено")
+		log.Fatal("DB_DSN not installed")
 	}
 
+	//Перевірка встановлення ключа сертифікату
+	//Для встановленн необхідно виконати в командному рядку:
+	//set CSRF_AUTH_KEY=your-32-character-csrf-key-here-minimum
 	csrfKey := os.Getenv("CSRF_AUTH_KEY")
 	if csrfKey == "" || len(csrfKey) < 32 {
-		log.Fatal("CSRF_AUTH_KEY має бути встановлено й бути принаймні 32 байти")
+		log.Fatal("CSRF_AUTH_KEY must be installed and have size at least 32 bites")
 	}
 
+	//Перевірка встановлення ключа сертифікату
+	//Для встановленн необхідно виконати в командному рядку:
+	//set SESSION_KEY=your-32-character-session-key-here-minimum
 	sessionKey := os.Getenv("SESSION_KEY")
 	if sessionKey == "" || len(sessionKey) < 32 {
-		log.Fatal("SESSION_KEY має бути встановлено й бути принаймні 32 байти")
+		log.Fatal("SESSION_KEY must be installed and have size at least 32 bites")
 	}
 
 	certFile := os.Getenv("CERT_FILE")
@@ -177,7 +195,8 @@ func main() {
 	}
 
 	var err error
-	db, err = sql.Open("postgres", dsn)
+	//Підключення до бази даних
+	db, err = sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatalf("Помилка підключення до БД: %v", err)
 	}
@@ -187,31 +206,39 @@ func main() {
 		log.Fatalf("DB ping error: %v", err)
 	}
 
+	//Створення файлів Cookie, щоб зберігати дані входу користувача
 	store = sessions.NewCookieStore([]byte(sessionKey))
 	store.Options = &sessions.Options{
 		Path:     "/",
-		MaxAge:   86400 * 1, // 1 day
+		MaxAge:   86400 * 1,
 		HttpOnly: true,
 		Secure:   true,
 		SameSite: http.SameSiteStrictMode,
 	}
 
+	//Створення оболонки захисту
 	csrfProtect = csrf.Protect([]byte(csrfKey), csrf.Secure(true))
 
+	//Встановлення маршрутизації
 	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+	})
 	mux.HandleFunc("/register", registerHandler)
 	mux.HandleFunc("/login", loginHandler)
 	mux.HandleFunc("/home", homeHandler)
 	mux.HandleFunc("/logout", logoutHandler)
 
-	// static (if потрібні стилі) — приклад
-	// mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-
+	//Запуск сервера
 	handler := csrfProtect(mux)
 
 	addr := fmt.Sprintf(":%s", port)
 	fmt.Printf("Starting HTTPS server on https://localhost:%s\n", port)
-	fmt.Println("Сертифікат: ", certFile, " ключ: ", keyFile)
+	fmt.Println("Sertificate: ", certFile, " key: ", keyFile)
 	if err := http.ListenAndServeTLS(addr, certFile, keyFile, handler); err != nil {
 		log.Fatalf("ListenAndServeTLS: %v", err)
 	}

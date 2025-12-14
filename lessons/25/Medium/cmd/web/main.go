@@ -12,7 +12,7 @@ func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	logger.Info("Starting server", "addr", ":8080")
 
-	// Ініціалізація маршрутизатора
+	//Створення маршрутизації
 	mux := http.NewServeMux()
 	queueHandler := handler.NewQueueHandler(logger)
 

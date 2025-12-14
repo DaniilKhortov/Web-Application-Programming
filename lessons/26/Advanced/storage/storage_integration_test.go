@@ -33,27 +33,27 @@ func teardown(t *testing.T) {
 }
 
 func TestStorage_CreateAndRetrieveClient(t *testing.T) {
-	// 1. Налаштування середовища
+	// Налаштування середовища
 	s := setup(t)
 	defer func() {
-		s.DB.Close() // 🔹 Закриваємо БД
-		teardown(t)  // 🔹 Потім видаляємо файл
+		s.DB.Close() // Закриття БД
+		teardown(t)  // Видалення файлу
 	}()
 
-	// 2. Створюємо клієнта
+	// Створення клієнта
 	expectedName := "Olha"
 	id, err := s.AddClient(expectedName)
 	if err != nil {
 		t.Fatalf("failed to insert client: %v", err)
 	}
 
-	// 3. Отримуємо клієнта назад
+	//  Отримання даних клієнта назад
 	client, err := s.GetClientByID(id)
 	if err != nil {
 		t.Fatalf("failed to retrieve client: %v", err)
 	}
 
-	// 4. Перевіряємо цілісність даних
+	//  Перевіряємо цілісність даних
 	if client.ID != int(id) {
 		t.Errorf("expected ID %d, got %d", id, client.ID)
 	}

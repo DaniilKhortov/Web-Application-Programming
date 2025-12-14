@@ -19,7 +19,9 @@ func SimulateQueueConcat(n int) string {
 // замість конкатенації. Це зменшує кількість алокацій пам’яті та прискорює виконання.
 func SimulateQueueConcatOptimized(n int) string {
 	var sb strings.Builder
-	sb.Grow(n * 30) // невелике попереднє виділення пам’яті
+	// невелике попереднє виділення пам’яті
+	sb.Grow(n * 30)
+
 	for i := 1; i <= n; i++ {
 		sb.WriteString(fmt.Sprintf("Client #%d is waiting...\n", i))
 	}

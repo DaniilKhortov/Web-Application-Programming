@@ -16,7 +16,7 @@ func main() {
 		fmt.Println("Request error:", err)
 		return
 	}
-	// Обов’язково закриваємо тіло відповіді
+	// Закриття тіла відповіді
 	defer resp.Body.Close()
 
 	// Перевірка статус-коду

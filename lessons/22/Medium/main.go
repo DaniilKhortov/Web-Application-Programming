@@ -9,11 +9,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Структура для клієнтів черги
 type QueueItem struct {
 	Number int
 	Name   string
 }
 
+// Обробник кореневого маршруту
 func queueHandler(w http.ResponseWriter, r *http.Request) {
 	queue := []QueueItem{
 		{1, "Olena"},
@@ -22,6 +24,7 @@ func queueHandler(w http.ResponseWriter, r *http.Request) {
 		{4, "Alexij"},
 	}
 
+	//Вивід сторінки
 	tmpl, err := template.ParseFiles("templates/queue.html")
 	if err != nil {
 		http.Error(w, "Template error: "+err.Error(), http.StatusInternalServerError)
@@ -34,8 +37,10 @@ func queueHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Обробник маршруту /register для сторінки реєстрації
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
+	//Обробка запитів
 	case http.MethodGet:
 
 		tmpl, err := template.ParseFiles("templates/register.html")
@@ -57,14 +62,13 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 
 		hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
-			http.Error(w, "Помилка хешування пароля", http.StatusInternalServerError)
+			http.Error(w, "Hash error", http.StatusInternalServerError)
 			return
 		}
 
-		fmt.Println("=== Registering user ===")
+		fmt.Println("Registering user:")
 		fmt.Println("Name:", username)
 		fmt.Println("Hashed password:", string(hash))
-		fmt.Println("=====================================")
 
 		fmt.Fprintf(w, "Registration is successful!")
 	default:
@@ -73,6 +77,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	//Встановлення маршрутизації
 	http.HandleFunc("/", queueHandler)
 	http.HandleFunc("/register", registerHandler)
 

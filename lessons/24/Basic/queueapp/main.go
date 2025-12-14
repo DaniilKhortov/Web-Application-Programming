@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+// SimulateQueueConcat — базова функція, що імітує формування повідомлень
+// для клієнтів електронної черги шляхом конкатенації рядків через оператор +
 func SimulateQueueConcat(n int) string {
 	var result string
 	for i := 1; i <= n; i++ {
@@ -13,6 +15,8 @@ func SimulateQueueConcat(n int) string {
 	return result
 }
 
+// SimulateQueueConcatOptimized — оптимізована версія, що використовує strings.Builder
+// замість конкатенації. Це зменшує кількість алокацій пам’яті та прискорює виконання.
 func SimulateQueueConcatOptimized(n int) string {
 	var sb strings.Builder
 	for i := 1; i <= n; i++ {

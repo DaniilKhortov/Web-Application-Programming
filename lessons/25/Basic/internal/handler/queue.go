@@ -13,6 +13,7 @@ var clients = []string{
 	"Volodymyr Kononenko",
 }
 
+// Обробник кореневого маршруту
 func QueueHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Received %s request for %s", r.Method, r.URL.Path)
 
@@ -24,6 +25,7 @@ func QueueHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//Структура  надсилання даних до клієнту
 	data := struct {
 		Title   string
 		Clients []string

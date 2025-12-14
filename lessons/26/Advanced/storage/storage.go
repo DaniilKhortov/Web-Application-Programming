@@ -18,9 +18,9 @@ type Storage struct {
 	DB *sql.DB
 }
 
-// NewStorage створює підключення до БД (sqlite для простоти)
+// NewStorage створює підключення до БД
 func NewStorage(dbPath string) (*Storage, error) {
-	db, err := sql.Open("sqlite", dbPath) // ← ось тут зміна!
+	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("cannot open DB: %w", err)
 	}

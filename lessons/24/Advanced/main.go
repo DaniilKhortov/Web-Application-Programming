@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// Функція для створення навантаження шляхом тривалих складних арифметичних операцій
 func simulateWork() {
 	start := time.Now()
 	sum := 0.0
@@ -20,6 +21,7 @@ func simulateWork() {
 	fmt.Println("Work time:", time.Since(start))
 }
 
+// Обробник кореневого маршоуту
 func handler(w http.ResponseWriter, r *http.Request) {
 	simulateWork()
 	w.WriteHeader(http.StatusOK)
@@ -27,7 +29,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-
+	//Запуск серверу
+	//Для перевірки у новому рядку консолі необхідно виконати:
+	//hey -n 1000 -c 10 http://localhost:8080/work
 	http.HandleFunc("/work", handler)
 
 	fmt.Println("Server launched on http://localhost:8080")

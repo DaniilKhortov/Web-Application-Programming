@@ -5,10 +5,11 @@ type QueueService interface {
 	GetAllClients() []string
 }
 
-// RealQueueService — справжня реалізація (для реального проєкту може брати дані з БД)
+// Ініціалізація RealQueueService
 type RealQueueService struct{}
 
+//Функція повернення даних клієнтів
 func (r *RealQueueService) GetAllClients() []string {
-	// У реальному застосунку тут був би запит до БД.
+
 	return []string{"Olha", "Ivan", "Maria"}
 }

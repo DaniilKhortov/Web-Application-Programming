@@ -14,7 +14,7 @@ type QueueHandler struct {
 	clients []string
 }
 
-// Конструктор
+// Конструктор для даних клієнтів
 func NewQueueHandler(logger *slog.Logger) *QueueHandler {
 	return &QueueHandler{
 		logger: logger,
@@ -27,7 +27,7 @@ func NewQueueHandler(logger *slog.Logger) *QueueHandler {
 	}
 }
 
-// ShowQueue — Read-операція
+// ShowQueue — зчитує параметри з даних клієнтів
 func (h *QueueHandler) ShowQueue(w http.ResponseWriter, r *http.Request) {
 	h.logger.Info("Handling request",
 		"method", r.Method,
@@ -58,13 +58,14 @@ func (h *QueueHandler) ShowQueue(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// AddClient — Create-операція
+// AddClient — функція для додавання клієнтів
 func (h *QueueHandler) AddClient(w http.ResponseWriter, r *http.Request) {
 	h.logger.Info("Handling request",
 		"method", r.Method,
 		"path", r.URL.Path,
 	)
 
+	//Обробник запитів
 	switch r.Method {
 	case http.MethodGet:
 		tmpl, err := template.ParseFiles("web/templates/add.html")

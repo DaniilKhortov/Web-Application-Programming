@@ -9,15 +9,18 @@ import (
 	"strconv"
 )
 
+// Структура обробника черги
 type QueueHandler struct {
 	svc    *service.QueueService
 	logger *slog.Logger
 }
 
+// Функція доступу до даних модулю
 func NewQueueHandler(svc *service.QueueService, logger *slog.Logger) *QueueHandler {
 	return &QueueHandler{svc: svc, logger: logger}
 }
 
+// Обробник маршруту /home
 func (h *QueueHandler) Home(w http.ResponseWriter, r *http.Request) {
 	h.logger.Info("Request", "method", r.Method, "path", r.URL.Path)
 
@@ -39,6 +42,7 @@ func (h *QueueHandler) Home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Обробник маршруту /create
 func (h *QueueHandler) Create(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
@@ -62,6 +66,7 @@ func (h *QueueHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Обробник маршруту /edit
 func (h *QueueHandler) Edit(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
@@ -83,6 +88,7 @@ func (h *QueueHandler) Edit(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Обробник маршруту /delete
 func (h *QueueHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		h.clientError(w, http.StatusMethodNotAllowed)
@@ -101,7 +107,7 @@ func (h *QueueHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// --- centralized error handlers ---
+// Обробники помилок
 func (h *QueueHandler) serverError(w http.ResponseWriter, err error) {
 	h.logger.Error("server error", "error", err)
 	http.Error(w, "Internal Server Error", http.StatusInternalServerError)

@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-// Table-driven test для ValidateClientName
+// Серіалізоване тестування для ValidateClientName
 func TestValidateClientName(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -41,7 +41,7 @@ func TestValidateClientName(t *testing.T) {
 	}
 }
 
-// допоміжна функція для пошуку фрагмента тексту
+// Допоміжна функція для пошуку фрагмента тексту
 func contains(s, substr string) bool {
 	return strings.Contains(s, substr)
 }

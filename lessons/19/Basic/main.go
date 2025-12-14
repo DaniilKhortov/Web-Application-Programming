@@ -7,15 +7,17 @@ import (
 )
 
 func main() {
-
+	//Створення кореневого обробника
 	http.Handle("/", http.FileServer(http.Dir("static")))
 
+	//Створення обробника для шляху /submit
 	http.HandleFunc("/submit", submitHandler)
 
 	fmt.Println("Server launched at http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
+// Функція обробки запитів від клієнта
 func submitHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

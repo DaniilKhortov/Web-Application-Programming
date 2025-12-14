@@ -16,10 +16,12 @@ func main() {
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
+	//Підключення модулів
 	store := storage.NewMemoryStore()
 	svc := service.NewQueueService(store)
 	h := handler.NewQueueHandler(svc, logger)
 
+	// Створення маршрутизації
 	mux := http.NewServeMux()
 	fileServer := http.FileServer(http.Dir("web/static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fileServer))
