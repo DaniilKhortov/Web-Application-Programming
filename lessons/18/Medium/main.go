@@ -1,41 +1,43 @@
 package main
 
 import (
-	"html/template"
+	"fmt"
 	"log"
 	"net/http"
 )
 
-type SensorData struct {
-	ID    string
-	Value float64
-}
+var queue []string
+
+//Запуск різних середовищ:
+//export GO_ENV=development
+//go run .
+
+//export GO_ENV=production
+//go run .
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	//Завантаження конфігурації
+	cfg := LoadConfig()
 
-		tmpl, err := template.ParseFiles("templates/index.html")
-		if err != nil {
-			http.Error(w, "Template parse error", http.StatusInternalServerError)
-			log.Println("Template parse error:", err)
+	log.Printf("Lounchung environment: %s\n", cfg.Env)
+	log.Printf("Service: %s\n", cfg.ServiceName)
+
+	//Обробка http маршруту для запису клієнта до черги
+	http.HandleFunc("/enqueue", func(w http.ResponseWriter, r *http.Request) {
+		if len(queue) >= cfg.MaxQueueSize {
+			http.Error(w, "Queue is full", http.StatusBadRequest)
 			return
 		}
 
-		data := SensorData{
-			ID:    "Sensor-001",
-			Value: 123.45,
+		name := r.URL.Query().Get("name")
+		if name == "" {
+			name = "Anonymous"
 		}
 
-		err = tmpl.Execute(w, data)
-		if err != nil {
-			http.Error(w, "Template execute error", http.StatusInternalServerError)
-			log.Println("Template execute error:", err)
-		}
+		queue = append(queue, name)
+		fmt.Fprintf(w, "Client %s added. Position in queue: %d\n", name, len(queue))
 	})
 
-	log.Println("Server launched at http://localhost:8080")
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		log.Fatal("Server launch error", err)
-	}
+	log.Printf("Server launched at port %s\n", cfg.Port)
+	log.Fatal(http.ListenAndServe(":"+cfg.Port, nil))
 }
