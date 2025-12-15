@@ -19,23 +19,26 @@ var (
 var queue = 0
 
 func main() {
-	cfg := config.Load()
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("Config error: %v", err)
+	}
 
 	//Вивід збірки
 	log.Printf(
-		"Starting %s | env=%s | version=%s | build=%s | commit=%s",
+		"%s started | env=%s | version=%s | build=%s | commit=%s",
 		cfg.AppName, cfg.Env, Version, BuildTime, GitCommit,
 	)
 
 	//Обробник кореневого марщруту
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "E-Queue\nCurrent position: %d\n", queue)
+	http.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
+		fmt.Fprintf(w, "Електронна черга\nПоточний номер: %d\n", queue)
 	})
 
 	//Обробник шляху маршрутизації /next для додавання клієнтів
-	http.HandleFunc("/next", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/next", func(w http.ResponseWriter, _ *http.Request) {
 		queue++
-		fmt.Fprintf(w, "New client added to queue. Position in queue: %d\n", queue)
+		fmt.Fprintf(w, "Новий номер у черзі: %d\n", queue)
 	})
 
 	addr := ":" + cfg.Port
