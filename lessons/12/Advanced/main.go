@@ -5,52 +5,46 @@ import (
 	"time"
 )
 
-// Горутина producer. Вона виводитиме дані до отримання сигналу завершення роботи
-func producer(dataCh chan<- int, done <-chan bool) {
+// producer — відправник даних у канал
+func producer(dataCh chan<- int, done <-chan struct{}) {
+	defer close(dataCh)
+
 	for i := 1; i <= 10; i++ {
 		select {
 		case <-done:
-			fmt.Println("Producer: sygnal of finishing recieved. Work finished!")
+			fmt.Println("Registrator: recieved signal. Finishing task...")
 			return
 		case dataCh <- i:
-			fmt.Printf("Producer: sent data %d\n", i)
+			fmt.Println("Registrator: added client", i)
 			time.Sleep(400 * time.Millisecond)
 		}
 	}
-	fmt.Println("Producer: all data sent. That is all for today!")
 }
 
-// Горутина consumer. Вона виводитиме дані буферизованого каналу до його закриття
+// consumer — отримувач даних з каналу
 func consumer(dataCh <-chan int) {
 	for value := range dataCh {
-		fmt.Printf("Consumer: recieved data %d\n", value)
+		fmt.Println("Operator: servicing client", value)
 		time.Sleep(700 * time.Millisecond)
 	}
-	fmt.Println("Consumer: channel is closed! Work finished!")
+	fmt.Println("Operator: queue is empty")
 }
 
 func main() {
+	dataCh := make(chan int)
 
-	//Ініціалізація буфериованого каналу
-	dataCh := make(chan int, 3)
+	// Канал скасування
+	done := make(chan struct{})
 
-	//Ініціалізація звичайного каналу
-	done := make(chan bool)
-
-	//Запуск горутин
+	// Запуск producer та consumer
 	go producer(dataCh, done)
 	go consumer(dataCh)
 
+	// Імітація зовнішнього скасування
 	time.Sleep(3 * time.Second)
-	fmt.Println("Main: sending sygnal of finishing to producer...")
+	fmt.Println("Main goroutine: sending sygnal of stop")
+	close(done)
 
-	//Після завершення роботи, передаємо сигнал завершення роботи
-	done <- true
-
-	time.Sleep(1 * time.Second)
-
-	//Закриття каналу
-	close(dataCh)
-
-	fmt.Println("Main: work finished!")
+	time.Sleep(2 * time.Second)
+	fmt.Println("That is all for today!")
 }

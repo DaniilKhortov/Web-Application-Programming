@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -10,25 +11,30 @@ import (
 )
 
 func main() {
-	//Ініціалізація застосунку fyne
+	// Ініціалізація застосунку fyne
 	myApp := app.New()
+	myWindow := myApp.NewWindow("E-Queue")
 
-	//Створення вікна графічного інтерфейсу
-	myWindow := myApp.NewWindow("Застосунок 1")
+	// Лічильник номерів у черзі
+	queueNumber := 0
 
-	//Створення кнопки
-	button := widget.NewButton("Натисни мене!", func() {
-		//Тіло функції-тригера
-		fmt.Println("Кнопку натиснуто!")
+	// Мітка для відображення останнього номера
+	label := widget.NewLabel("Press the button to get number to queue")
+
+	// Кнопка для отримання номера
+	button := widget.NewButton("Get number", func() {
+		queueNumber++
+		label.SetText("Your number in queue: " + strconv.Itoa(queueNumber))
+		fmt.Println("User got number:", queueNumber)
 	})
 
-	//Розміщення кнопки по-центру
-	centered := container.NewCenter(button)
-	myWindow.SetContent(centered)
+	// Розміщення кнопки та мітки по центру
+	content := container.NewVBox(
+		label,
+		button,
+	)
 
-	//Задання розміру вікна
-	myWindow.Resize(fyne.NewSize(300, 200))
-
-	//Запуск графічного інтерфейсу
+	myWindow.SetContent(container.NewCenter(content))
+	myWindow.Resize(fyne.NewSize(400, 200))
 	myWindow.ShowAndRun()
 }

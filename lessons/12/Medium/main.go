@@ -6,47 +6,40 @@ import (
 	"time"
 )
 
-// Горутина, що надсилає дані у канал
-func sensorWorker(id int, dataCh chan int, wg *sync.WaitGroup) {
+func sender(id int, dataCh chan<- int, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	//Ітеративно заповнюємо буферизований канал
 	for i := 1; i <= 4; i++ {
 		value := id*10 + i
+		fmt.Printf("Goroutine %d: adding client %d\n", id, value)
 		dataCh <- value
-		fmt.Printf("Counter #%d: sent value %d\n", id, value)
-		time.Sleep(300 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond) // імітація роботи
 	}
-	fmt.Printf("Counter #%d: finished work\n", id)
 }
 
 func main() {
-
-	//Ініціалізація буфериованого каналу
+	// Буферизований канал розміром 5
 	dataCh := make(chan int, 5)
 
-	//Ініціалізація WaitGroup з лічильником 3 для паралельної обробки
 	var wg sync.WaitGroup
-	wg.Add(3)
 
-	//Запуск горутини
+	// Запуск 3 горутин для реєстрації клієнтів
+	wg.Add(3)
 	for i := 1; i <= 3; i++ {
-		go sensorWorker(i, dataCh, &wg)
+		go sender(i, dataCh, &wg)
 	}
 
-	//Блокування усіх потоків до завершення роботи горутин
+	// Закриття каналу після завершення всіх відправників
 	go func() {
 		wg.Wait()
-		//Закриття каналу
 		close(dataCh)
+		fmt.Println("All goroutines finished their task. Channel closed!")
 	}()
 
-	fmt.Println("[Agregator] Waiting for data ...")
-
-	//Вивід результатів
+	// Приймання значень через for range
 	for value := range dataCh {
-		fmt.Printf("[Agregator] reciewed data %d\n", value)
+		fmt.Println("Main queue: servicing client ", value)
 	}
 
-	fmt.Println("Work finished! Channel closed!")
+	fmt.Println("That is all for today!")
 }

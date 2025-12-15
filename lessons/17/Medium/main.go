@@ -5,54 +5,54 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sync"
 )
 
-// Створення структури даних, що передаватимуться між клієнтом та сервером
-type PowerData struct {
-	PowerGenerated int    `json:"power_generated"`
-	Units          string `json:"units"`
+// Структура для JSON-відповіді на маршруті /queue
+type QueueResponse struct {
+	NextNumber int `json:"next_number"`
 }
+
+// Поточний номер клієнта у черзі
+var currentNumber int = 0
+var mu sync.Mutex
 
 func main() {
-	//Реєстрація функцій-обробників для URL-шляхів
-	http.HandleFunc("/", rootHandler)
-	http.HandleFunc("/status", statusHandler)
-	http.HandleFunc("/data", dataHandler)
+	// Обробник кореневого маршруту "/"
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "Server is running")
+	})
 
-	fmt.Println("Server deployed at 8081...")
+	// Обробник маршруту "/status"
+	http.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "Status: OK")
+	})
 
-	// Запуск серверу на порту 8081
+	// Обробник маршруту "/data"
+	http.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
+		response := map[string]interface{}{
+			"service": "customer queue",
+			"units":   "clients",
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	})
+
+	// Новий маршрут "/next" для отримання наступного номера у черзі
+	http.HandleFunc("/next", func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		currentNumber++
+		response := QueueResponse{NextNumber: currentNumber}
+		mu.Unlock()
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	})
+
+	// Запуск HTTP-сервера на порту 8081
+	fmt.Println("Starting server on http://localhost:8081")
 	err := http.ListenAndServe(":8081", nil)
 	if err != nil {
-		log.Fatal("Error at server deployment:", err)
-	}
-}
-
-// Обробник кореневого маршруту /
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Server is running")
-}
-
-// Функція обробник для маршруту /status
-func statusHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Status: OK")
-}
-
-// Функція обробник для маршруту /data
-func dataHandler(w http.ResponseWriter, r *http.Request) {
-
-	//Створення структурованого повідомлення
-	data := PowerData{
-		PowerGenerated: 1500,
-		Units:          "watts",
-	}
-
-	//Додавання заголовку до повідомлення
-	w.Header().Set("Content-Type", "application/json")
-
-	//Кодування повідомлення
-	err := json.NewEncoder(w).Encode(data)
-	if err != nil {
-		http.Error(w, "Error generating JSON", http.StatusInternalServerError)
+		log.Fatal("Server failed to start: ", err)
 	}
 }

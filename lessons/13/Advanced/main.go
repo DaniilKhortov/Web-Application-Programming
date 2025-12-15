@@ -2,66 +2,54 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"time"
 )
 
-// clientProcessor — генерує події (обробку клієнтів)
-func clientProcessor(done chan<- int, shutdown <-chan struct{}) {
+// Функція обробки клієнтів
+func ClientProcessor(processingDone chan<- int, shutdown <-chan struct{}) {
 	clientID := 1
+
 	for {
 		select {
 		case <-shutdown:
-			fmt.Println("[Processor] Recieved finnishing command. Aborting process.")
+			fmt.Println("Operator: shutdown command reciewed")
 			return
 		default:
-			// імітація тривалості обробки клієнта
-			time.Sleep(time.Duration(200+rand.Intn(300)) * time.Millisecond)
-			fmt.Printf("[Processor] Client #%d served.\n", clientID)
-			done <- clientID
+			time.Sleep(100 * time.Millisecond)
+			processingDone <- clientID
 			clientID++
 		}
 	}
 }
 
-// statusMonitor — слухає два канали: події обробки і сигнал завершення
-func statusMonitor(done <-chan int, shutdown <-chan struct{}) {
-	active := 0
+// Функція моніторингу статусу черги
+func StatusMonitor(processingDone <-chan int, shutdown <-chan struct{}) {
 	for {
 		select {
-		case id := <-done:
-			active++
-			fmt.Printf("[Monitor] Clients served: %d (last #%d)\n", active, id)
+		case id := <-processingDone:
+			fmt.Println("Servicing client:", id)
 
 		case <-shutdown:
-			fmt.Printf("[Monitor] Recieved finnishing command. Result: %d clients.\n", active)
+			fmt.Println("StatusMonitor: finishing task...")
 			return
 		}
 	}
 }
 
 func main() {
-
-	// processingDone — канал повідомляє, що черговий клієнт оброблений
+	// небуферизована обробка
 	processingDone := make(chan int)
-
-	// shutdown — глобальний сигнал зупинки всієї системи (вимикає монітор)
 	shutdown := make(chan struct{})
 
-	// Імітація джерела подій (обробка клієнтів)
-	go clientProcessor(processingDone, shutdown)
+	go ClientProcessor(processingDone, shutdown)
+	go StatusMonitor(processingDone, shutdown)
 
-	// Імітація монітору стану системи
-	go statusMonitor(processingDone, shutdown)
+	time.Sleep(1 * time.Second)
 
-	// Дозволяємо системі попрацювати кілька секунд
-	time.Sleep(3 * time.Second)
-
-	// Відправляємо глобальний сигнал завершення
-	fmt.Println("\n[MAIN] Sending command to end...")
+	// Глобальне завершення
 	close(shutdown)
 
-	// Додатковий час для коректного завершення горутин
-	time.Sleep(1 * time.Second)
-	fmt.Println("[MAIN] Work is done!")
+	// Невелика пауза, щоб горутини коректно завершились
+	time.Sleep(200 * time.Millisecond)
+	fmt.Println("E-Queue system stopped")
 }

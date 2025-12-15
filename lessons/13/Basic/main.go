@@ -3,78 +3,53 @@ package main
 import (
 	"fmt"
 	"sync"
-	"time"
 )
 
-// Задання кількості потоків
-const workers = 1000
+var (
+	queueCounter int
+	mutex        sync.Mutex
+	wg           sync.WaitGroup
+)
 
-// simulateWithoutMutex — виконує обробку без блокування Mutex
-func simulateWithoutMutex() int {
-	var counter int
-	var wg sync.WaitGroup
-	wg.Add(workers)
-
-	for i := 0; i < workers; i++ {
-		go func(id int) {
-
-			time.Sleep(time.Microsecond * time.Duration(id%5))
-
-			counter = counter + 1
-			wg.Done()
-		}(i)
-	}
-
-	wg.Wait()
-	return counter
+// Функція небезпечного доступу до даних черги
+func unsafeClient() {
+	defer wg.Done()
+	queueCounter++
 }
 
-// simulateWithMutex — виконує обробку з блокуванням Mutex
-func simulateWithMutex() int {
-	var counter int
-	var wg sync.WaitGroup
-	var mu sync.Mutex
-	wg.Add(workers)
+// Функція безпечного доступу до даних черги з Mutex
+func safeClient() {
+	defer wg.Done()
 
-	for i := 0; i < workers; i++ {
-		go func(id int) {
+	mutex.Lock()
+	defer mutex.Unlock()
 
-			time.Sleep(time.Microsecond * time.Duration(id%5))
-
-			//Блокування інших потоків від модифікації змінної counter
-			mu.Lock()
-			defer mu.Unlock()
-			counter = counter + 1
-			wg.Done()
-		}(i)
-	}
-
-	wg.Wait()
-	return counter
+	queueCounter++
 }
 
 func main() {
+	clients := 1000
 
-	fmt.Printf("Running %d goroutines to serve clients simulteniosly.\n\n", workers)
+	//Демонстрація гонки даних
+	queueCounter = 0
+	wg.Add(clients)
 
-	//Виконання роботи без бепечної обробки даних
-	fmt.Println("Data Race without Mutex:")
-	noMutexCount := simulateWithoutMutex()
-	fmt.Printf("Result: %d (expected %d)\n", noMutexCount, workers)
-	if noMutexCount != workers {
-		fmt.Println("Data race happened!")
-	} else {
-		fmt.Println("Somehow data race was avoided. Run again to be sure!")
+	for i := 0; i < clients; i++ {
+		go unsafeClient()
 	}
-	fmt.Println()
 
-	//Виконання роботи з бепечною обробкою даних
-	fmt.Println("Data Race with Mutex:")
-	withMutexCount := simulateWithMutex()
-	fmt.Printf("Result: %d (expected %d)\n", withMutexCount, workers)
-	if withMutexCount == workers {
-		fmt.Println("Data race was avoided!")
-	} else {
-		fmt.Println("Error! Something went wrong!")
+	wg.Wait()
+	fmt.Println("Amount of serviced clients in queue without synchronization (Data Race):", queueCounter)
+	fmt.Println("Expected: 1000")
+	//Демонстрація безпечної обробки даних
+	queueCounter = 0
+	wg.Add(clients)
+
+	for i := 0; i < clients; i++ {
+		go safeClient()
 	}
+
+	wg.Wait()
+	fmt.Println("Amount of serviced clients in queue with Mutex:", queueCounter)
+	fmt.Println("Expected: 1000")
 }

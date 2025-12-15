@@ -6,63 +6,60 @@ import (
 	"time"
 )
 
-// Створення структури черги
-type ElectronicQueue struct {
-	value int
-	mu    sync.RWMutex
+// Структура стану черги
+type QueueState struct {
+	sync.RWMutex
+	counter int
 }
 
-// Get - дозволяє переглядати клієнта з черги
-func (q *ElectronicQueue) Get(id int) int {
-	//RLock дозволяє безпечно зчитати дані
-	//При блокувані модифікуючих потоків, RLock буде заблокований до завершення змін
-	q.mu.RLock()
-	defer q.mu.RUnlock()
+// Функція зчитування стану черги
+func (q *QueueState) Get() int {
+	q.RLock()
+	defer q.RUnlock()
 
-	fmt.Printf("[Reader %02d] Reading: %d\n", id, q.value)
+	// імітація читання
 	time.Sleep(10 * time.Millisecond)
-	return q.value
+	return q.counter
 }
 
-// Update - модифікує дані клієнта
-func (q *ElectronicQueue) Update(id int) {
-	q.mu.Lock()
-	defer q.mu.Unlock()
+// Функція оновлення стану
+func (q *QueueState) Update() {
+	q.Lock()
+	defer q.Unlock()
 
-	old := q.value
-	q.value++
-	fmt.Printf("[Writer %02d] Updating %d into %d\n", id, old, q.value)
-	time.Sleep(50 * time.Millisecond)
+	time.Sleep(50 * time.Millisecond) // імітація запису
+	q.counter++
 }
 
 func main() {
-	queue := &ElectronicQueue{}
-	var wg sync.WaitGroup
+	var (
+		queue QueueState
+		wg    sync.WaitGroup
+	)
 
-	//Задання кількості readers для читання та writers для зміни даних
 	readers := 100
 	writers := 5
 
-	fmt.Printf("Running %d readers and %d writers to serve clients simulteniosly.\n\n", readers, writers)
-
-	//Запуск усіх горутин
+	// Запуск readers
+	wg.Add(readers)
 	for i := 0; i < readers; i++ {
-		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
-			queue.Get(id)
-		}(i + 1)
+			value := queue.Get()
+			fmt.Printf("Reader %d read value: %d\n", id, value)
+		}(i)
 	}
 
+	// Запуск writers
+	wg.Add(writers)
 	for i := 0; i < writers; i++ {
-		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
-			queue.Update(id)
-		}(i + 1)
+			queue.Update()
+			fmt.Printf("Writer %d updated queue\n", id)
+		}(i)
 	}
 
 	wg.Wait()
-	fmt.Printf("\nFinal  queue: %d\n", queue.value)
-	fmt.Println("RWMutex synchronization complete!")
+	fmt.Println("Final queue state:", queue.counter)
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -12,56 +11,54 @@ import (
 )
 
 func main() {
-	//Ініціалізація застосунку fyne
 	myApp := app.New()
+	myWindow := myApp.NewWindow("E-Queue")
 
-	//Створення вікна графічного інтерфейсу
-	myWindow := myApp.NewWindow("Застосунок 2")
+	// Поля вводу: Ім'я та Вік клієнта
+	nameEntry := widget.NewEntry()
+	nameEntry.SetPlaceHolder("Enter name: ")
 
-	//Створення першого поля вводу
-	entry1 := widget.NewEntry()
-	entry1.SetPlaceHolder("Введіть перше число")
+	surnameEntry := widget.NewEntry()
+	surnameEntry.SetPlaceHolder("Enter surname: ")
 
-	//Створення другого поля вводу
-	entry2 := widget.NewEntry()
-	entry2.SetPlaceHolder("Введіть друге число")
+	// Мітка для виводу результату
+	resultLabel := widget.NewLabel("")
 
-	//Створення напису з результатом
-	resultLabel := widget.NewLabel("Місце для результату")
+	// Кнопка для додавання у чергу
+	button := widget.NewButton("Get number in queue", func() {
+		name := nameEntry.Text
+		surname := surnameEntry.Text
 
-	//Створення кнопки
-	calcButton := widget.NewButton("Обчислити суму", func() {
-		//Тіло функції-тригера
-		num1Text := entry1.Text
-		num2Text := entry2.Text
-
-		num1, err1 := strconv.ParseFloat(num1Text, 64)
-		num2, err2 := strconv.ParseFloat(num2Text, 64)
-
-		if err1 != nil || err2 != nil {
-			resultLabel.SetText(fmt.Sprintf("[%s] Помилка: введіть лише числа!", time.Now().Format("15:04:05")))
+		// Базова валідація
+		if name == "" {
+			resultLabel.SetText("Error: name cannot be empty")
 			return
 		}
 
-		sum := num1 + num2
+		if surname == "" {
+			resultLabel.SetText("Error: name cannot be empty")
+			return
+		}
 
-		//Задання значення напису
-		resultLabel.SetText(fmt.Sprintf("[%s] Сума: %.2f", time.Now().Format("15:04:05"), sum))
+		// Формування номера у черзі на основі часу
+		queueNumber := time.Now().Unix() % 1000
+		result := fmt.Sprintf("Client %s %s got number in queue: %d", name, surname, queueNumber)
+		resultLabel.SetText(result)
+
+		// Вивід у консоль (додатково для перевірки)
+		fmt.Println(result)
 	})
 
-	//Розміщення вмісту
+	// Розміщення елементів інтерфейсу вертикально
 	content := container.NewVBox(
-		widget.NewLabel("Введіть два числа для обчислення суми:"),
-		entry1,
-		entry2,
-		calcButton,
+		widget.NewLabel("Enter data to enter the queue"),
+		nameEntry,
+		surnameEntry,
+		button,
 		resultLabel,
 	)
-	myWindow.SetContent(content)
 
-	//Задання розміру вікна
+	myWindow.SetContent(container.NewCenter(content))
 	myWindow.Resize(fyne.NewSize(400, 300))
-
-	//Запуск графічного інтерфейсу
 	myWindow.ShowAndRun()
 }

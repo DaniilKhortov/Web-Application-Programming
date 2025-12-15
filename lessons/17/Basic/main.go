@@ -7,21 +7,15 @@ import (
 )
 
 func main() {
+	// Реєстрація обробника для кореневого маршруту "/"
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "Server is running")
+	})
 
-	//Реєстрація функцію-обробника для URL-шляху
-	http.HandleFunc("/", rootHandler)
-
-	fmt.Println("Server deployed at 8081...")
-
-	// Запуск серверу на порту 8081
+	// Запуск HTTP-сервера на порту 8081
+	fmt.Println("Starting server on http://localhost:8081")
 	err := http.ListenAndServe(":8081", nil)
 	if err != nil {
-		log.Fatal("Error at server deployment:", err)
+		log.Fatal("Server failed to start: ", err)
 	}
-}
-
-// Функція-обробник
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Fprintln(w, "Server is running")
 }
