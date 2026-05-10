@@ -19,6 +19,6 @@
 
 Пошта: daniil.khortov.2005@gmail.com
 
-Посилання репозиторію: https://github.com/DaniilKhortov/Web-Application-Programming.git/tree/main/App
+Посилання репозиторію: [Гіперпосилання](App)
 
 ![](assets/images/KPI1.png)
