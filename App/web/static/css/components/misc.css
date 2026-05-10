@@ -1,0 +1,144 @@
+.separator {
+    display: none;
+    width: 99%;
+    height: 1px;
+    background-color: #b0b0b0;
+
+    @media screen and (min-width: 1200px) {
+        display: block;
+    }
+}
+
+.hidden {
+    position: absolute;
+    visibility: hidden;
+    height: 0;
+    width: 0;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    pointer-events: none;
+
+}
+
+
+.mirage-hidden {
+    @media screen and (min-width: 0) and (max-width: 1199px) {
+        position: absolute;
+        visibility: hidden;
+        height: 0;
+        width: 0;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        pointer-events: none;
+    }
+
+
+}
+
+.half-invisible {
+    opacity: 50%;
+}
+
+
+.input-field {
+    width: 100%;
+}
+
+
+.error-block {
+    font-family: rubik;
+    color: red;
+    text-align: center;
+    margin: 10px 0 15px 0
+}
+
+
+input[type="file"] {
+    display: none;
+}
+
+.custom-file-upload {
+    display: inline-block;
+
+
+}
+
+
+
+.file-upload-label:hover {
+    cursor: pointer;
+}
+
+.file-upload-label{
+        font-family: rubik;
+}
+
+
+.progress-bar{
+  position: relative;
+  margin: 4px;
+  float:left;
+  text-align: center;
+}
+
+.barOverflow{ 
+  position: relative;
+  overflow: hidden; 
+  width: 500px; height: 250px; 
+  margin-bottom: -124px;
+}
+
+.bar, .bar-var{
+  position: absolute;
+  top: 0; left: 0;
+  width: 500px; height: 500px; 
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 50px solid greenyellow;       
+  border-bottom-color: gray; 
+  border-right-color: gray;
+  transform: rotate(225deg);
+}
+
+
+
+
+
+.centered-container{
+    display: flex;
+    justify-content: center;
+}
+
+.table-container{
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: auto;
+    border: 1px solid #ddd;
+    margin-top: 20px;
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-container th {
+    position: sticky;
+    top: 0;
+    z-index: 1;                 
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4); 
+
+}
+.table-container th:hover{
+    cursor:pointer;
+}
+
+.th-sort-asc::after {
+    content: " ▲";
+}
+
+.th-sort-desc::after {
+    content: " ▼";
+}

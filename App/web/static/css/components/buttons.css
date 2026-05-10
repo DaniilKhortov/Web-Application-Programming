@@ -1,0 +1,156 @@
+button {
+    border: none;
+    background: none;
+
+
+}
+
+.reveal-button {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.reveal-button svg {
+    width: 90px;
+    height: auto;
+
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    @media screen and (min-width: 1200px) {
+        width: inherit;
+    }
+}
+
+.module-block-title .mirage-block button svg {
+    width: 30px;
+
+    @media screen and (min-width: 1200px) {
+        width: 40px;
+    }
+}
+
+.reveal-button:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+.reveal-button.is-active svg {
+    transform: rotate(90deg);
+}
+
+
+
+
+.github-btn-container,
+.login-btn-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+
+
+
+.github-btn-container button,
+.login-btn-container button {
+
+    background: #008a3c;
+    background: linear-gradient(39deg, rgba(0, 138, 60, 1) 50%, rgba(0, 117, 51, 1) 100%);
+
+    font-family: Kharkiv;
+    color: white;
+    font-size: 2.5em;
+    font-weight: 700;
+    text-decoration: none;
+
+    padding: 10px;
+    border: 2px solid #008a3c;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+
+
+    transition: ease 0.3s;
+
+    @media screen and (min-width: 1200px) {
+        font-size: 24px;
+    }
+
+}
+
+.github-btn-container a,
+.login-btn-container a {
+    text-decoration: none;
+}
+
+
+
+
+.github-btn-container button:hover,
+.login-btn-container button:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+    transition: ease 0.3s;
+
+    @media screen and (min-width: 1200px) {
+        background: white;
+
+        color: green;
+        transition: ease 0.3s;
+        fill: green;
+        ;
+    }
+
+
+}
+
+.login-btn-container button {
+    padding: 10px 15px 10px 15px;
+    background: black;
+    border: 2px solid black;
+    font-size: 30px;
+    margin: 0 10px 0 10px;
+
+    @media screen and (min-width: 1200px) {
+        padding: 10px 30px 10px 30px;
+
+    }
+}
+
+
+.login-btn-container button:hover {
+    color: black;
+    background: white;
+
+    @media screen and (min-width: 1200px) {
+
+        color: black;
+    }
+}
+
+.common-button {
+    padding: 2px 5px 2px 5px;
+    background: black;
+    border: 2px solid black;
+    margin: 0 10px 0 10px;
+    color: white;
+    border-radius: 10px;
+
+    align-items: center;
+    justify-content: center;
+    transition: ease 0.3s;
+    font-family: rubik;
+
+}
+
+.common-button:hover {
+    color: black;
+    background: white;
+    cursor: pointer;
+    transform: scale(1.1);
+    transition: ease 0.3s;
+
+}

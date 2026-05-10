@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="csrf-token" content="{{.CSRFToken}}">
+    <title>Програмування вебзастосунків на Go</title>
+    <link rel="stylesheet" href="../static/css/main.css" />
+  </head>
+
+  <body>
+    <div id="page" class="site" style="background: url(https://ipze.kpi.ua/wp-content/themes/ipze_new-master/assets/img/background.svg) no-repeat; min-height: 100vh; ">
+      <main class="page-container">
+        {{template "menu" .}}
+
+
+        <div class="lesson-block">
+          <div class="lesson-block-title">
+            <h2><b>Практичне заняття <span id="lessonId">{{.LessonID}}</span>.</b> {{.LessonTitle}}</h2>
+          </div>
+          <div class="separator"></div>
+
+          <div class="switch-bl">
+            <div class="switch-content">
+              <div id="theo-sect" class="switch theo-sect" onclick="change_period('theo-sect')">МАТЕРІАЛ</div>
+              <div id="prac-sect" class="switch prac-sect" onclick="change_period('prac-sect')">ПРАКТИКА</div>
+              <div id="selector" class="selector">МАТЕРІАЛ</div>
+            </div>
+          </div>
+
+          <div class="lesson-block-content lesson-block-content-theory" id="theory-content">
+            <div class="aim-block border-container yellow-container">
+              <div class="subtitle">
+                <h3>Мета</h3>
+              </div>
+              <div class="desc">
+                <p>{{.LessonAim}}</p>
+              </div>
+            </div>
+            <div class="intro-block border-container light-yellow-container">
+              <div class="subtitle">
+                <h3>Вступ</h3>
+              </div>
+              <div class="desc">
+                
+                {{range .LessonIntro}}
+                  <p>{{.Content}}</p>
+                  {{else}}
+                      <p>Вміст відсутній.</p>
+                  {{end}}
+              </div>
+            </div>
+            <div class="info-block border-container">
+              <div class="subtitle">
+                <h3>Теорія</h3>
+              </div>
+              <div class="separator"></div>
+              <div class="desc">
+                 {{range .LessonTheoContent}}
+                  <p>{{.Content}}</p>
+                  {{else}}
+                      <p>Вміст відсутній.</p>
+                  {{end}}
+              </div>
+            </div>
+
+            <div class="reveal-block">
+              <div class="reveal-block-title title-with-button" onclick="toggleModule('links-1', 'btn-links-1')">
+                <h3>Перелік посилань</h3>
+                <button id="btn-links-1" class="reveal-button">
+                  <svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 6L15 12L9 18" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+              </div>
+              <div class="separator"></div>
+              <div class="reveal-block-content hidden" id="links-1">
+                {{range .LessonLinksContent}}
+                <a href={{.Link}}>
+                  <div class="link-block border-container link-yellow-container">
+                    <div class="white-icon bl-icon bl-icon-blue">
+                      <div class="boarder-icon">
+                        <p>{{.ID}}</p>
+                      </div>
+                    </div>
+                    <div class="desc">
+                      <p>{{.Content}}</p>
+                    </div>
+                  </div>
+                </a>
+                {{else}}
+                <a href="">
+                  <div class="link-block border-container link-yellow-container">
+                    <div class="white-icon bl-icon bl-icon-blue">
+                      <div class="boarder-icon">
+                        <p>0</p>
+                      </div>
+                    </div>
+                    <div class="desc">
+                      <p>Вміст відсутній</p>
+                    </div>
+                  </div>
+                </a>                
+                {{end}}
+              </div>
+            </div>
+
+            <div class="reveal-block">
+              <div class="reveal-block-title title-with-button" onclick="toggleModule('links-2', 'btn-links-2')">
+                <h3>Список рекомендованої літератури</h3>
+                <button id="btn-links-2" class="reveal-button">
+                  <svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 6L15 12L9 18" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+              </div>
+              <div class="separator"></div>
+              <div class="reveal-block-content hidden" id="links-2">
+              {{range .LessonMaterialContent}}
+                <a href={{.Link}}>
+                  <div class="link-block border-container link-yellow-container">
+                    <div class="white-icon bl-icon bl-icon-red">
+                      <div class="boarder-icon">
+                        <p>{{.ID}}</p>
+                      </div>
+                    </div>
+                    <div class="desc">
+                      <p>{{.Content}}</p>
+                    </div>
+                  </div>
+                </a>
+                {{else}}
+                <a href="">
+                  <div class="link-block border-container link-yellow-container">
+                    <div class="white-icon bl-icon bl-icon-red">
+                      <div class="boarder-icon">
+                        <p>0</p>
+                      </div>
+                    </div>
+                    <div class="desc">
+                      <p>Вміст відсутній</p>
+                    </div>
+                  </div>
+                </a>                
+                {{end}}
+              </div>
+            </div>
+
+            <div class="reveal-block">
+              <div class="reveal-block-title title-with-button" onclick="toggleModule('quest-list-1', 'btn-quest-1')">
+                <h3>Контрольні питання для самоперевірки</h3>
+                <button id="btn-quest-1" class="reveal-button">
+                  <svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 6L15 12L9 18" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+              </div>
+              <div class="separator"></div>
+              <div class="reveal-block-content hidden" id="quest-list-1">
+                
+                {{range .LessonQA}}
+                <div class="question-wrap animatable">
+                  <div class="link-block border-container quest-container yellow-container" id="quest-{{.ID}}" onclick="toggleModule('answr-{{.ID}}', 'quest-{{.ID}}')">
+                    <div class="white-icon bl-icon bl-icon-purple">
+                      <div class="boarder-icon">
+                        <p>{{.ID}}</p>
+                      </div>
+                    </div>
+                    <div class="desc">
+                      <p>{{.Question}}</p>
+                    </div>
+                  </div>
+
+                  <div class="link-block answer-block answer-green-container hidden" id="answr-{{.ID}}">
+                    <p>{{.Answer}}</p>
+                  </div>
+                </div>
+                {{else}}
+                <div class="question-wrap animatable">
+                  <div class="link-block border-container quest-container yellow-container" id="quest-1" onclick="toggleModule('answr-1', 'quest-1')">
+                    <div class="white-icon bl-icon bl-icon-purple">
+                      <div class="boarder-icon">
+                        <p>0</p>
+                      </div>
+                    </div>
+                    <div class="desc">
+                      <p>Вміст відсутній</p>
+                    </div>
+                  </div>
+
+                  <div class="link-block answer-block answer-green-container hidden" id="answr-1">
+                    <p>Вміст відсутній</p>
+                  </div>
+                </div>
+
+                {{end}}
+                                  
+
+              </div>
+              <div class="end-container">            
+                <div class="subtitle">
+                  <p class="centered-text half-invisible">Хортов Даніїл ТВ-21 Київ 2026</p>
+              </div>
+            </div>
+            </div>
+          </div>
+
+          <div class="lesson-block-content lesson-block-content-practic hidden" id="practical-content">
+            <div class="info-block border-container">
+              <div class="subtitle">
+                <h3>Завдання за темою</h3>
+              </div>
+            </div>
+
+            <div class="aim-block border-container light-green-container green-text">
+              <div class="subtitle">
+                <h4>Базовий рівень</h4>
+              </div>
+              <div class="desc">
+                <p>{{.LessonTask1}}</p>
+              </div>
+            </div>
+
+            <div class="aim-block border-container light-yellow-container yellow-text">
+              <div class="subtitle">
+                <h4>Середній рівень</h4>
+              </div>
+              <div class="desc">
+                <p>{{.LessonTask2}}</p>
+              </div>
+            </div>
+
+            <div class="aim-block border-container light-red-container red-text">
+              <div class="subtitle">
+                <h4>Просунутий рівень</h4>
+              </div>
+              <div class="desc">
+                <p>{{.LessonTask3}}</p>
+              </div>
+            </div>
+
+            <div class="reveal-block">
+              <div class="reveal-block-title title-with-button" onclick="toggleModule('content-list-5', 'btn-content-5')">
+                <h3>Критерії оцінювання</h3>
+                <button id="btn-content-5" class="reveal-button">
+                  <svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 6L15 12L9 18" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+              </div>
+              <div class="separator"></div>
+              <div class="reveal-block-content hidden" id="content-list-5">
+                <div class="intro-block border-container light-green-container animatable">
+                  <div class="image-block">
+                    <img src= {{.LessonImage1}}/>
+                    <div class="image-script green-text">
+                      <p>Результат роботи застосунку базового рівня складності</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="aim-block animatable border-container light-green-container green-text">
+                  <div class="subtitle">
+                    <h4>Базовий рівень (0-60 балів)</h4>
+                  </div>
+
+                  <div class="desc">
+                    <p>{{.LessonReq1}}</p>
+                  </div>
+                </div>
+
+                <div class="intro-block border-container light-yellow-container animatable">
+                  <div class="image-block">
+                    <img src={{.LessonImage2}} />
+                    <div class="image-script yellow-text">
+                      <p>Результат роботи застосунку середнього рівня складності</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="aim-block border-container animatable light-yellow-container yellow-text">
+                  <div class="subtitle">
+                    <h4>Середній рівень (61-80 балів)</h4>
+                  </div>
+                  <div class="desc">
+                    <p>{{.LessonReq2}}</p>
+                  </div>
+                </div>
+
+                <div class="intro-block border-container light-red-container animatable">
+                  <div class="image-block">
+                    <img src={{.LessonImage3}} />
+                    <div class="image-script red-text">
+                      <p>Результат роботи застосунку просунутого рівня складності</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="aim-block border-container animatable light-red-container red-text">
+                  <div class="subtitle">
+                    <h4>Просунутий рівень (81-100 балів)</h4>
+                  </div>
+
+                  <div class="desc">
+                    <p>{{.LessonReq3}}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {{template "variants" .}}
+
+            <div class="github-btn-container">
+              <a href={{.LessonProductGithub}}>
+                <button>
+                  <svg width="30" height="30" viewBox="0 0 1024 1024" fill="white" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8C0 11.54 2.29 14.53 5.47 15.59C5.87 15.66 6.02 15.42 6.02 15.21C6.02 15.02 6.01 14.39 6.01 13.72C4 14.09 3.48 13.23 3.32 12.78C3.23 12.55 2.84 11.84 2.5 11.65C2.22 11.5 1.82 11.13 2.49 11.12C3.12 11.11 3.57 11.7 3.72 11.94C4.44 13.15 5.59 12.81 6.05 12.6C6.12 12.08 6.33 11.73 6.56 11.53C4.78 11.33 2.92 10.64 2.92 7.58C2.92 6.71 3.23 5.99 3.74 5.43C3.66 5.23 3.38 4.41 3.82 3.31C3.82 3.31 4.49 3.1 6.02 4.13C6.66 3.95 7.34 3.86 8.02 3.86C8.7 3.86 9.38 3.95 10.02 4.13C11.55 3.09 12.22 3.31 12.22 3.31C12.66 4.41 12.38 5.23 12.3 5.43C12.81 5.99 13.12 6.7 13.12 7.58C13.12 10.65 11.25 11.33 9.47 11.53C9.76 11.78 10.01 12.26 10.01 13.01C10.01 14.08 10 14.94 10 15.21C10 15.42 10.15 15.67 10.55 15.59C13.71 14.53 16 11.53 16 8C16 3.58 12.42 0 8 0Z" transform="scale(64)" fill="currentColor" />
+                  </svg>
+                  <p>Репозиторій проекту</p>
+                </button>
+              </a>
+            </div>
+
+            <div class="info-block border-container">
+              <div class="">
+                <h3>Методика виконання типових завдань на прикладі завдання для варіанту 1 «Застосунок для електронної черги обслуговування клієнтів»</h3>
+              </div>
+              <div class="separator"></div>
+
+              <div class="intro-block border-container light-yellow-container">
+                <div class="subtitle">
+                  <h3>Загальна ідея</h3>
+                </div>
+
+                <div class="desc">
+                  <p>{{.LessonProductIdea}}</p>
+                </div>
+              </div>
+
+              <div class="intro-block border-container light-yellow-container">
+                <div class="subtitle">
+                  <h3>Структура і компоненти</h3>
+                </div>
+                <div class="horizontal-container">
+                  <div class="image-block structure-image">
+                    <img src={{.LessonArch1}} />
+                    <div class="image-script">
+                      <p>Файлова структура проєктів</p>
+                    </div>
+                  </div>
+
+                  <div class="desc horizontal-desc">
+                    <p>{{.LessonProductStruct}}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="intro-block border-container light-yellow-container">
+                <div class="subtitle">
+                  <h3>Використані підходи</h3>
+                </div>
+
+                <div class="desc">
+                  <p>{{.LessonProductFeatures}}</p>
+                </div>
+              </div>
+
+              <div class="intro-block border-container light-yellow-container">
+                <div class="subtitle">
+                  <h3>Взаємодія в застосунку</h3>
+                </div>
+
+                <div class="desc">
+                  <p>{{.LessonProductInteract}}</p>
+                </div>
+              </div>
+
+              <div class="intro-block border-container light-yellow-container">
+                <div class="subtitle">
+                  <h3>Підсумок</h3>
+                </div>
+
+                <div class="desc">
+                  <p>{{.LessonProductSummary}}</p>
+                </div>
+              </div>
+              <div class="reveal-block">
+                <div class="reveal-block-title title-with-button" onclick="toggleModule('content-list-6', 'btn-content-6')">
+                  <h3>Домашнє завдання</h3>
+                  <button id="btn-content-6" class="reveal-button">
+                    <svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 6L15 12L9 18" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="separator"></div>
+                <div class="reveal-block-content hidden" id="content-list-6">
+                  <div class="aim-block animatable border-container light-green-container green-text">
+                    <div class="desc">
+                      {{range .LessonHomework}}
+                        <p>{{.Content}}</p>
+                      {{else}}
+                        <p>Вміст відсутній.</p>
+                      {{end}}
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="info-block ">
+                <div class="">
+                    <h3>Завантажити роботу</h3>
+                </div>
+
+                <div class="separator"></div>
+
+                <div id="mark-none" class="upload-content">
+                      <label for="fileInput" class="file-upload-label">Обрати файл</label><input id="fileInput" type="file" />
+                        <div class="error-block"><p id="error-msg"></p></div>
+                        
+                          
+                      <div class="centered-block login-btn-container">
+                          <button onclick="uploadFile()">Надіслати</button>
+                      </div>
+                </div>
+                <div id="mark-unmarked" class=" centered-block upload-content">
+                  <div class="centered-container">
+                      <div class="progress-bar">
+                        <div class="barOverflow">
+                          <div class="bar-var"></div>
+                        </div>
+                        <p class="bar-text">Оцінка<br>У процесі...</p>
+                      </div>
+                  </div>
+                </div>   
+                
+                <div id="mark-marked" class=" centered-block upload-content">
+                  <div class="centered-container">
+                      <div class="progress-bar">
+                        <div class="barOverflow">
+                          <div id="bar-var" class="bar-var"></div>
+                        </div>
+                        <p class="bar-text" id="text-mark">0/100</p>
+                      </div>
+                  </div>
+                </div>  
+
+
+
+
+
+                <div class="end-container">            
+                  <div class="subtitle">
+                    <p class="centered-text half-invisible">Хортов Даніїл ТВ-21 Київ 2026</p>
+                </div>
+  
+
+
+              </div>
+
+
+            </div>
+          </div>
+
+            
+        </div>
+
+        </div>
+      </main>
+    </div>
+  
+  </body>
+</html>
+<script>
+//Функція для оновлення позиції меню при динамічному зміні розміру ширини екрану 
+// (Так! Через CSS не робе для старіших браузерів)
+const mediaQuery = window.matchMedia('(min-width: 1200px)');
+
+function handleTabletChange(e) {
+  const button = document.getElementById('menu-btn');
+  if (!button) return;
+  if (e.matches && button.classList.contains('is-active')) {
+    
+
+    toggleMenu('menu',  'menu-wrapper', 'menu-btn')
+  }
+}
+
+mediaQuery.addEventListener('change', handleTabletChange);
+
+
+handleTabletChange(mediaQuery);
+
+
+//Функція для розгортання/згортання згортаючих блоків 
+  function toggleModule(moduleId, buttonId) {
+    const element = document.getElementById(moduleId);
+    const button = document.getElementById(buttonId);
+    element.classList.toggle("hidden");
+    button.classList.toggle('is-active')
+
+  }
+//Функція для розгортання/згортання згортаючих блоків меню (юо там більше елементів)
+  function toggleMenu(moduleId, wrapperId, buttonId) {
+    const element = document.getElementById(moduleId);
+    const wrapper = document.getElementById(wrapperId);
+    const button = document.getElementById(buttonId);
+    element.classList.toggle("mirage-hidden");
+    wrapper.classList.toggle("fixed");
+    button.classList.toggle('is-active')
+
+  }
+
+//Функція для зміни вмісту між теорією та практикою
+  function change_period(period) {
+    var theoSect = document.getElementById("theo-sect");
+    var pracSect = document.getElementById("prac-sect");
+
+    var selector = document.getElementById("selector");
+
+
+    var theoContent = document.getElementById("theory-content");
+    var pracContent = document.getElementById("practical-content");
+
+    if (period === "theo-sect") {
+        selector.style.left = 0;
+        selector.style.width = theoSect.clientWidth + "px";
+        selector.style.backgroundColor = "#fcea9b";
+        selector.innerHTML = "МАТЕРІАЛ";
+
+        pracContent.classList.add("hidden");
+        theoContent.classList.remove("hidden");
+
+    } else if (period === "prac-sect") {
+        selector.style.left = theoSect.clientWidth + "px";
+        selector.style.width = pracSect.clientWidth + "px";
+        selector.innerHTML = "ПРАКТИКА";
+        selector.style.backgroundColor = "#fcd83b";
+
+        pracContent.classList.remove("hidden");
+        theoContent.classList.add("hidden");
+    } else {
+        selector.style.left = 0;
+        selector.style.width = theoSect.clientWidth + "px";
+        selector.style.backgroundColor = "#fcea9b";
+        selector.innerHTML = "МАТЕРІАЛ";
+
+        pracContent.classList.add("hidden");
+        theoContent.classList.remove("hidden");
+    }
+  }
+
+//Функція для запиту до серверу на вівдвантаження файлу у Gitlab
+async function uploadFile() {
+            //Зчитання даних сторінки
+            const fileInput = document.getElementById('fileInput');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const lessonID = document.getElementById('lessonId').textContent;
+
+            //Захист від дурнів
+            if (fileInput.files.length === 0) {
+              document.getElementById("error-msg").innerHTML="Жодного файлу не було обрано!";
+              return;
+            }
+            
+            //Зчитування користувача через Cookie
+            const userId = getCookie("user_id");
+
+
+            //Створення структури даних для сервера
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+            formData.append("username", userId); 
+            formData.append("lessonID", lessonID); 
+          
+
+            //Запит POST на зберігання файлів у GitLab
+            const response = await fetch('https://localhost:8080/upload', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-Token': csrfToken 
+                    },
+                    body: formData
+                });
+
+            const result = await response.text();
+            
+        }
+
+//Допоміжна функція для отримання Cookies       
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+
+//Функція для запиту на оцінку
+async function checkStatus() {
+  //Зчитання даних сторінки
+    const lessonID = document.getElementById('lessonId').textContent;
+    const noWork = document.getElementById('mark-none');
+    const noMark = document.getElementById('mark-unmarked');
+    const finalyMarked = document.getElementById('mark-marked');
+    const barVar = document.getElementById('bar-var');
+    const textMark = document.getElementById('text-mark');
+    
+
+    try {
+      //Очікування відповіді
+        const response = await fetch(`/taskStatus?lessonID=${lessonID}`);
+        const data = await response.json();
+
+        //Перевірка відповіді
+        const statusElement = document.getElementById("statusTest");
+//Реакція якщо нема роботи
+        if (data.status === "no_record") {
+          noWork.classList.remove("hidden");
+          noMark.classList.add("hidden");
+          finalyMarked.classList.add("hidden");
+
+        } 
+        //Реакція якщо робота не оцінена
+        else if (data.status === "pending") {
+          noWork.classList.add("hidden");
+          noMark.classList.remove("hidden");
+          finalyMarked.classList.add("hidden");
+        } 
+        //Реакція якщо робота оцінена
+        else if (data.status === "graded") {
+          //Обчислення заповненості віджету-спідометра
+          const markInt = parseInt(data.mark, 10) || 0;
+          const fillDegrees = (180 * markInt) / 100 + 225;
+
+
+          barVar.style.transform = `rotate(${fillDegrees}deg)`;
+
+          //Обчислення кольору наповнення віджету-спідометру
+          const hue = (markInt * 120) / 100;
+          barVar.style.border = `50px solid hsl(${hue}, 80%, 40%)`;
+          barVar.style.borderBottomColor = "gray"
+          barVar.style.borderRightColor = "gray"
+
+
+          textMark.innerHTML = `Оцінка<br>${markInt}/100`;
+
+          noWork.classList.add("hidden");
+          noMark.classList.add("hidden");
+          finalyMarked.classList.remove("hidden");
+
+
+        }
+    } catch (error) {
+        console.error("Помилка при отриманні оцінки:", error);
+    }
+}
+
+//Циклічна перевірка статусу оцінки раз на 10 парсек
+const gradePolling = setInterval(checkStatus, 10000);
+
+
+checkStatus();
+
+</script>

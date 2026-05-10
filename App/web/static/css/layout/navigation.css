@@ -1,0 +1,208 @@
+.course-block {
+    flex: 0 0 auto;
+    width: 95%;
+
+    @media screen and (min-width: 1200px) {
+        width: 83.33333333%;
+    }
+
+
+}
+
+.course-block-title {
+
+    margin-top: 5px;
+    margin-bottom: 5px;
+
+
+
+    @media screen and (min-width: 1200px) {
+        margin-top: 88px;
+        margin-bottom: 75px;
+    }
+}
+
+.module-block-title {
+    margin-top: 5px;
+    margin-bottom: 5px;
+
+
+
+    @media screen and (min-width: 1200px) {
+        margin-top: 44px;
+        margin-bottom: 37px;
+    }
+
+}
+
+.module-block-content {
+    display: flex;
+    flex-direction: column;
+
+    @media screen and (min-width: 692px) {
+        flex-wrap: wrap;
+        flex-direction: unset;
+    }
+
+    @media screen and (min-width: 1200px) {
+        flex-wrap: wrap;
+        flex-direction: unset;
+    }
+
+
+}
+
+
+
+
+
+
+.lesson-container {
+    display: block;
+
+    position: relative;
+    border-radius: 29px;
+
+    padding: 10px 10px 10px 10px;
+    margin: 10px 10px 10px 10px;
+    text-decoration: none;
+
+    @media screen and (min-width: 692px) {
+        width: 275px;
+    }
+
+    @media screen and (min-width: 1200px) {
+        width: 475px;
+    }
+
+
+
+
+
+
+}
+
+
+.lesson-card-inner {
+
+    background-color: #f2e2a2;
+    border-radius: 29px;
+    padding: 10px;
+    height: 100%;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+    color: black;
+    position: relative;
+
+}
+
+.lesson-container:hover .lesson-card-inner {
+    transform: scale(1.03);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+
+
+.lesson-img {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: center;
+
+}
+
+.lesson-title {
+    position: absolute;
+    top: 120px;
+    left: -15px;
+    background: #FCD95B;
+    padding: 10px 20px;
+    font-weight: bold;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+
+    @media screen and (min-width: 290px) {
+        top: 140px;
+    }
+
+
+    @media screen and (min-width: 330px) {
+        top: 170px;
+    }
+
+    @media screen and (min-width: 380px) {
+        top: 190px;
+    }
+
+    @media screen and (min-width: 416px) {
+        top: 220px;
+    }
+    @media screen and (min-width: 485px) {
+        top: 250px;
+    }
+    @media screen and (min-width: 540px) {
+        top: 270px;
+    }
+    @media screen and (min-width: 570px) {
+        top: 300px;
+    }
+    @media screen and (min-width: 624px) {
+        top: 340px;
+    }
+
+    @media screen and (min-width: 692px) {
+        top: 140px;
+    }
+    @media screen and (min-width: 1200px) {
+        top: 280px;
+    }
+
+
+}
+
+
+.module-block-title .title-with-button h2 {
+    font-size: 1.1em;
+}
+
+.lesson-title::before {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 0;
+    border-style: solid;
+    border-width: 0 15px 15px 0;
+    border-color: transparent #e7c035 transparent transparent;
+}
+
+.lesson-desc {
+    margin-top: 27px;
+    margin-bottom: 15px;
+    font-size: 0.5em;
+    width: 95%;
+    margin-left: auto;
+
+    @media screen and (min-width: 290px) {
+        font-size: 0.9em;
+
+    }
+
+    @media screen and (min-width: 290px) {
+        font-size: 20px;
+
+    }
+    @media screen and (min-width: 692px) {
+        font-size: 0.9em;
+
+    }
+    @media screen and (min-width: 1200px) {
+        font-size: 18px;
+        width: 100%;
+
+    }
+}
+
+
+
+.title-with-button:hover {
+    cursor: pointer;
+}

@@ -1,0 +1,95 @@
+        {{define "menu"}}
+        <div class="menu-wrapper" id="menu-wrapper">
+          <div class="menu-block mirage-hidden" id="menu">
+            <div class="menu-block-content text-white no-hypertext">
+              <div class="menu-block-title ">
+                <a href="/"><h3>Програмування вебзастосунків на Go</h3></a>
+              </div>
+              <div class="separator"></div>
+
+              <div class="menu-module-block">
+                <div class="title-with-button" onclick="toggleModule('menu-module-1', 'btn-menu-module-1')">
+                  <h3>Модуль 1.</h3>
+                  <button id="btn-menu-module-1" class="reveal-button">
+                    <svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 6L15 12L9 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="menu-module-content hidden" id="menu-module-1">
+                  <a href="/lesson1"><h5>ПР 1. Налаштування середовища</h5></a>
+                  <a href="/lesson2"><h5>ПР 2. Змінні та константи</h5></a>
+                  <a href="/lesson3"><h5>ПР 3. Логічні умови і цикли</h5></a>
+                  <a href="/lesson4"><h5>ПР 4. Зрізи, масиви, відображення</h5></a>
+                </div>
+              </div>
+
+              <div class="menu-module-block">
+                <div class="title-with-button" onclick="toggleModule('menu-module-2', 'btn-menu-module-2')">
+                  <h3>Модуль 2.</h3>
+                  <button id="btn-menu-module-2" class="reveal-button">
+                    <svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 6L15 12L9 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="menu-module-content hidden" id="menu-module-2">
+                  <a href="/lesson5"><h5>ПР 5. Функції</h5></a>
+                  <a href="/lesson6"><h5>ПР 6. Вказівники</h5></a>
+                  <a href="/lesson7"><h5>ПР 7. Структури та методи</h5></a>
+                  <a href="/lesson8"><h5>ПР 8. Пакети та модулі</h5></a>
+                  <a href="/lesson9"><h5>ПР 9. ООП в Go</h5></a>
+                  <a href="/lesson10"><h5>ПР 10. C/C++ в Go</h5></a>
+                </div>
+              </div>
+
+              <div class="menu-module-block">
+                <div class="title-with-button" onclick="toggleModule('menu-module-3', 'btn-menu-module-3')">
+                  <h3>Модуль 3.</h3>
+                  <button id="btn-menu-module-3" class="reveal-button">
+                    <svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 6L15 12L9 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="menu-module-content hidden" id="menu-module-3">
+                  <a href="/lesson11"><h5>ПР 11. Паралельне програмування</h5></a>
+                  <a href="/lesson12"><h5>ПР 12. Канали даних</h5></a>
+                  <a href="/lesson13"><h5>ПР 13. Синхронізація потоків</h5></a>
+                  <a href="/lesson14"><h5>ПР 14. Асинхронне програмування</h5></a>
+                  <a href="/lesson15"><h5>ПР 15. Робота з файлами</h5></a>
+                  <a href="/lesson16"><h5>ПР 16. Графічні інтерфейси</h5></a>
+                </div>
+              </div>
+
+              <div class="menu-module-block">
+                <div class="title-with-button" onclick="toggleModule('menu-module-4', 'btn-menu-module-4')">
+                  <h3>Модуль 4.</h3>
+                  <button id="btn-menu-module-4" class="reveal-button">
+                    <svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9 6L15 12L9 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="menu-module-content hidden" id="menu-module-4">
+                  <a href="/lesson17"><h5>ПР 17. Створення HTTP-сервера</h5></a>
+                  <a href="/lesson18"><h5>ПР 18. Керування конфігурацією</h5></a>
+                  <a href="/lesson19"><h5>ПР 19. Створення обробників в Go</h5></a>
+                  <a href="/lesson20"><h5>ПР 20. REST-API в Go</h5></a>
+                  <a href="/lesson21"><h5>ПР 21. Робота з базами данних</h5></a>
+                  <a href="/lesson22"><h5>ПР 22. Безпека застосунку</h5></a>
+                  <a href="/lesson23"><h5>ПР 23. Підключення зовнішніх API</h5></a>
+                  <a href="/lesson24"><h5>ПР 24. Оптимізація застосунку</h5></a>
+                  <a href="/lesson25"><h5>ПР 25. Організація прроєкту та логування</h5></a>
+                  <a href="/lesson26"><h5>ПР 26. Тестування в Go</h5></a>
+                  <a href="/lesson27"><h5>ПР 27. Збірка та розгортання застосунку</h5></a>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          <div class="menu-btn-block">
+            <button class="menu-btn" id="menu-btn" onclick="toggleMenu('menu',  'menu-wrapper', 'menu-btn')"><h3>Модулі</h3></button>
+          </div>
+        </div>
+        {{end}}

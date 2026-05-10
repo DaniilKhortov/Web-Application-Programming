@@ -1,0 +1,102 @@
+.aut-form {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+
+}
+
+.aut-form-content {
+
+    width: 90%;
+    margin: 0 auto 0 auto;
+
+
+    @media screen and (min-width: 1200px) {
+        width: 50%;
+
+    }
+
+
+
+}
+
+.login-block {
+
+    margin: 20px 0 10px 0;
+}
+
+.aut-form h2 {
+    font-size: 20px;
+
+    @media screen and (min-width: 850px) {
+        font-size: 24px;
+
+    }
+
+    @media screen and (min-width: 1200px) {
+        font-size: 28px;
+
+    }
+}
+
+.aut-form button {
+    font-size: 14px;
+
+    @media screen and (min-width: 600px) {
+        font-size: 18px;
+
+    }
+
+    @media screen and (min-width: 850px) {
+        font-size: 22px;
+
+    }
+
+    @media screen and (min-width: 1200px) {
+        font-size: 24px;
+
+    }
+
+}
+
+.input-field {
+    font-family: Rubik;
+}
+
+
+.return-block {
+    margin-bottom: 30px;
+}
+
+.return-block button {
+    display: flex;
+    font-family: kharkiv;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+
+    @media screen and (min-width: 850px) {
+        font-size: 24px;
+
+    }
+
+    @media screen and (min-width: 1400px) {
+        font-size: 30px;
+
+    }
+}
+
+.return-block button svg {
+    width: 30px;
+
+    @media screen and (min-width: 850px) {
+        width: inherit;
+
+    }
+}
+
+.return-block a {
+    text-decoration: none;
+}
+
+

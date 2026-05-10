@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="csrf-token" content="{{.CSRFToken}}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Програмування вебзастосунків на Go</title>
+    <link rel="stylesheet" href="../static/css/main.css" />
+  </head>
+
+  <body>
+    <div id="page" class="site" style="background: url(https://ipze.kpi.ua/wp-content/themes/ipze_new-master/assets/img/background.svg) no-repeat; min-height: 100vh;  ">
+      <main class="page-container">
+        <div class="register-content">
+          <div class="course-block-title">
+            <h1>Програмування вебзастосунків на Go</h1>
+          </div>
+            <div class="return-block">
+              <a href="/"><button  class="reveal-button"><svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m14 6-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><p>Повернутися</p></button></a>
+          </div>
+
+          <div class="info-block border-container">
+            <div class="subtitle">
+              <h3>Роботи</h3>
+            </div>
+            <div class="separator"></div>
+          </div>
+          <div class="table-container">
+          <table id="fileTable">
+            <thead>
+              <tr>
+              <th>ID </th>
+              <th>ID користувача </th>
+              <th>Робота № </th>
+              <th>GitLab Роботи </th>
+              <th>Дата </th>
+              <th>Оцінка </th>
+              </tr>
+            </thead>
+            <tbody>
+              {{range .FileRecords}}
+              <tr>
+                <td>{{.ID}}</td>
+                <td>{{.Username}}</td>
+                <td>{{.Lesson}}</td>
+                <td><a href="{{.FilePath}}">{{.FilePath}}</a></td>
+                <td>{{.Date}}</td>
+                <td><input class="input-field" name="username" id="mark{{.ID}}" value="{{.Mark}}"/> </td>
+                <td ><button class="common-button" id="save-btn-files-{{.ID}}"  onclick="saveData({{.ID}}, 'mark{{.ID}}', 'update-mark', 'mark')">Зберегти</button></td>
+              </tr>
+              {{else}}
+              <tr>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td><input class="input-field" name="username" value=""/> </td>
+              </tr>
+              {{end}}
+          </tbody>
+
+
+          </table>
+          </div>
+
+
+          
+          <div class="info-block border-container">
+            <div class="subtitle">
+              <h3>Користувачі</h3>
+            </div>
+            <div class="separator"></div>
+          </div>
+          <div class="table-container">
+          <table id="userTable">
+            <thead>
+              <tr>
+              <th>ID </th>
+              <th>Користувач </th>
+              <th>E-mail</th>
+              <th>Role </th>
+              </tr>
+            </thead>
+            <tbody>
+              {{range .UserRecords}}
+              <tr>
+                <td>{{.ID}}</td>
+                <td>{{.Username}}</td>
+                <td>{{.Email}}</td>
+
+                <td><select class="input-field" id="role-{{.ID}}" name="role">
+                  <option value="admin" {{if eq .Role "admin"}}selected{{end}}>admin</option>
+                  <option value="user" {{if eq .Role "user"}}selected{{end}}>user</option>
+                </select></td>
+                <td ><button class="common-button" id="save-btn-user-{{.ID}}"  onclick="saveData({{.ID}}, 'role-{{.ID}}', 'update-role', 'role')">Зберегти</button></td>
+              </tr>
+              {{else}}
+              <tr>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td><input class="input-field" name="username" value=""/> </td>
+              </tr>
+              {{end}}
+          </tbody>
+
+
+          </table>
+          </div>
+
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
+<script>
+  //Інтерактивність заголовків
+  document.querySelectorAll('#fileTable th, #userTable th').forEach(headerCell => {
+    headerCell.addEventListener('click', () => {
+        const tableElement = headerCell.parentElement.parentElement.parentElement;
+        const headerIndex = Array.prototype.indexOf.call(headerCell.parentElement.children, headerCell);
+        const isAscending = headerCell.classList.contains('th-sort-asc');
+        
+        sortDataInTable(tableElement, headerIndex, !isAscending);
+    });
+});
+
+//Функція сортування записів у таблиці за заголовками
+function sortDataInTable(table, column, asc) {
+  
+    const dirModifier = asc ? 1 : -1;
+    const tBody = table.tBodies[0];
+    const rows = Array.from(tBody.querySelectorAll('tr'));
+
+    // Визначення відсортованості
+    const sortedRows = rows.sort((a, b) => {
+        let aColText = a.querySelector(`td:nth-child(${column + 1})`).innerText.trim();
+        let bColText = b.querySelector(`td:nth-child(${column + 1})`).innerText.trim();
+
+        const aInput = a.querySelector(`td:nth-child(${column + 1}) input`);
+        const bInput = b.querySelector(`td:nth-child(${column + 1}) input`);
+        if (aInput) aColText = aInput.value;
+        if (bInput) bColText = bInput.value;
+
+        const aCol = parseFloat(aColText) || aColText.toLowerCase();
+        const bCol = parseFloat(bColText) || bColText.toLowerCase();
+
+        if (aCol > bCol) return 1 * dirModifier;
+        if (aCol < bCol) return -1 * dirModifier;
+        return 0;
+    });
+
+    // Видалення всіх існуючих рядків
+    while (tBody.firstChild) {
+        tBody.removeChild(tBody.firstChild);
+    }
+
+    // Додання відсортованих рядків
+    tBody.append(...sortedRows);
+
+    // Оновлення стилів колонок (тобото міняються стрілочки)
+    table.querySelectorAll('th').forEach(th => th.classList.remove('th-sort-asc', 'th-sort-desc'));
+    table.querySelector(`th:nth-child(${column + 1})`).classList.toggle('th-sort-asc', asc);
+    table.querySelector(`th:nth-child(${column + 1})`).classList.toggle('th-sort-desc', !asc);
+}
+
+//Функція для зміни даних 
+function saveData(id, inputId, route, fieldName) {
+    const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfTokenMeta) {
+        console.error("Помилка: Мета-тег csrf-token не знайдено в <head>!");
+        return;
+    }
+    const csrfToken = csrfTokenMeta.getAttribute('content');
+
+
+
+    //Пошук поля
+    const inputElement = document.getElementById(inputId);
+    if (!inputElement) {
+        console.error("Елемент не знайдено:", inputId);
+        return;
+    }
+    //Імпорт значення поля
+    const newValue = inputElement.value;
+
+    const data = {};
+    data[fieldName] = newValue; 
+
+  //Надсилання запиту на зміну
+    fetch(`/admin/${route}/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken,
+        },
+        body: JSON.stringify(data)
+    })
+    //Результат запиту
+    .then(response => {
+        if (response.ok) {
+            alert('Дані успішно збережено!');
+        }else if (response.status === 403) {
+            alert('Помилка: Відмовлено в доступі (CSRF токен недійсний)');
+        } else {
+          
+            alert('Помилка при збереженні! Статус: ' + response.status);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Помилка мережі');
+    });
+}
+</script>

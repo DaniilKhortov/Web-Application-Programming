@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Програмування вебзастосунків на Go</title>
+    <link rel="stylesheet" href="../static/css/main.css" />
+  </head>
+
+  <body>
+    <div id="page" class="site" style="background: url(https://ipze.kpi.ua/wp-content/themes/ipze_new-master/assets/img/background.svg) no-repeat; min-height: 100vh;  ">
+      <main class="page-container">
+        <div class="course-block">
+          <div class="course-block-title">
+            <h1>Програмування вебзастосунків на Go</h1>
+          </div>
+          <div class="course-block-content">
+            <div class="module-container">
+              <div class="module-block-title">
+                <div class="title-with-button mirage-block" onclick = "toggleModule('module-1', 'btn-module-1')">
+                  <h2>Модуль 1. <span class="mirage-text">Основи програмування в Go</span></h2>
+                  <button id = "btn-module-1"  class="reveal-button"><svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg></button>
+                </div>
+
+                <div class="separator"></div>
+              </div>
+
+              <div class="module-block-content hidden" id = "module-1">
+                <a class="lesson-container" href="/lesson1">
+                  <div class="lesson-card-inner">
+                  <div class="lesson-img">
+                    <img src="../static/images/img-visit-card-lesson-1.png" />
+                  </div>
+                  <div class="lesson-title">
+                    <h3>Практичне заняття 1.</h3>
+                  </div>
+
+                  <div class="lesson-desc">
+                    <p>Ознайомлення з GO. Налаштування середовища та створення першої програми в Go.</p>
+                  </div>
+                  </div>
+                </a>
+
+                <a class="lesson-container" href="/lesson2">
+                  <div class="lesson-card-inner">
+                  <div class="lesson-img">
+                    <img src="../static/images/img-visit-card-lesson-2.png" />
+                  </div>
+                  <div class="lesson-title">
+                    <h3>Практичне заняття 2.</h3>
+                  </div>
+
+                  <div class="lesson-desc">
+                    <p>Ознайомлення зі змінними в Go. Проведення математичних операцій. Звичайний та форматований вивід даних.</p>
+                  </div>
+                  </div>
+                </a>
+
+                <a class="lesson-container" href="/lesson3">
+                  <div class="lesson-card-inner">
+                  <div class="lesson-img">
+                    <img src="../static/images/img-visit-card-lesson-3.png" />
+                  </div>
+                  <div class="lesson-title">
+                    <h3>Практичне заняття 3.</h3>
+                  </div>
+
+                  <div class="lesson-desc">
+                    <p>Ознайомлення з логічними та циклічними операторами в Go.</p>
+                  </div>
+                  </div>
+                </a>
+
+                <a class="lesson-container" href="/lesson4">
+                  <div class="lesson-card-inner">
+                  <div class="lesson-img">
+                    <img src="../static/images/img-visit-card-lesson-4.png" />
+                  </div>
+                  <div class="lesson-title">
+                    <h3>Практичне заняття 4.</h3>
+                  </div>
+
+                  <div class="lesson-desc">
+                    <p>Ознайомлення з масивами, зрізами та відображеннями в Go.</p>
+                  </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            <div class="module-block-title">
+                <div class="title-with-button mirage-block" onclick = "toggleModule('module-2', 'btn-module-2')">
+                <h2>Модуль 2. <span class="mirage-text">Імплементація процедурного та об’єктно-орієнтованого програмування в Go</span></h2>
+                <button id = "btn-module-2"  class="reveal-button"><svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg></button>
+                </div>
+
+
+ 
+              <div class="separator"></div>
+            </div>
+
+            <div class="module-block-content hidden" id="module-2">
+              <a class="lesson-container" href="/lesson5">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-5.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 5.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Ознайомлення з функціями в Go.</p>
+                </div>
+              </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson6">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-6.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 6.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Ознайомлення зі вказівниками в Go.</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson7">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-7.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 7.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Імплементація структур та методів у Go</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson8">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-8.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 8.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Ознайомлення з пакетами та модулями в Go</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson9">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-9.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 9.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Використання парадигм ООП в Go</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson10">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-10.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 10.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Виклик C/C++ коду з Go через cgo</p>
+                </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="module-block-title">
+
+              <div class="title-with-button mirage-block" onclick = "toggleModule('module-3', 'btn-module-3')">
+                  <h2>Модуль 3. <span class="mirage-text">Паралельне та асинхронне програмування в Go</span></h2>
+                  <button id = "btn-module-3"  class="reveal-button"><svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg></button>
+              </div>
+              
+
+              <div class="separator"></div>
+            </div>
+
+            <div class="module-block-content hidden" id = "module-3">
+              <a class="lesson-container" href="/lesson11">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-11.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 11.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Ознайомлення з паралельністю в Go. Використання goroutines</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson12">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-12.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 12.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Ознайомлення з каналами в Go</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson13">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-13.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 13.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Робота зі синхронізацією в Go. Робота з Mutex, RWMutex</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson14">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-14.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 14.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Застосування асинхронного програмування в Go. Безпечна обробка даних</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson15">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-15.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 15.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Робота з файлами в Go</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson16">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-16.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 16.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Ознайомлення з бібліотеками для створення GUI в Go</p>
+                </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="module-block-title">
+              <div class="title-with-button mirage-block" onclick = "toggleModule('module-4', 'btn-module-4')">
+                  <h2>Модуль 4. <span class="mirage-text">Основи веброзробки в Go</span></h2>
+                  <button id = "btn-module-4"  class="reveal-button"><svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg></button>
+                </div>
+
+
+              
+              <div class="separator"></div>
+            </div>
+
+            <div class="module-block-content hidden" id = "module-4">
+              <a class="lesson-container" href="/lesson17">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-17.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 17.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Створення HTTP-сервера в Go</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson18">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-18.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 18.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Керування конфігурацією застосунків Go</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson19">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-19.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 19.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Створення HTML-форм, обробка POST-запитів на сервері для отримання даних та їх валідація для забезпечення коректності та безпеки</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson20">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-20.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 20.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Застосування REST API в Go</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson21">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-21.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 21.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Робота з базами даних в Go</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson22">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-22.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 22.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Безпека вебзастосунків в Go. Використання протоколів шифрування. Виключення дефектів</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson23">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-23.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 23.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Підключення зовнішніх сервісів та  API  до вебзастосунку Go</p>
+                </div>
+                </div>
+              </a>
+
+
+              <a class="lesson-container" href="/lesson24">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-24.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 24.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Оптимізація роботи вебзастосунку Go. Тестування продуктивності. Методи пришвидшення роботи програмного продукту</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson25">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-25.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 25.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Створення вебзастосунку Go. Структуризація файлів застосунку. Визначення архітектури</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson26">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-26.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 26.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Тестування вебзастосунку Go</p>
+                </div>
+                </div>
+              </a>
+
+              <a class="lesson-container" href="/lesson27">
+                <div class="lesson-card-inner">
+                <div class="lesson-img">
+                  <img src="../static/images/img-visit-card-lesson-27.png" />
+                </div>
+                <div class="lesson-title">
+                  <h3>Практичне заняття 27.</h3>
+                </div>
+
+                <div class="lesson-desc">
+                  <p>Підготовка вебзастосунку Go до розгортання</p>
+                </div>
+                </div>
+              </a>
+
+
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
+
+<script>
+  //Функція для розгортання/згортання згортаючих блоків 
+  function toggleModule(moduleId, buttonId) {
+    const element = document.getElementById(moduleId);
+    const button = document.getElementById(buttonId);
+    element.classList.toggle("hidden");
+    button.classList.toggle('is-active')
+
+  }
+
+</script>
